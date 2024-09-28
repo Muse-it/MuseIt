@@ -3,14 +3,14 @@ import { createSignal } from "solid-js";
 export type Subclass = [string, number];
 
 export type SubclassFilter = {
-  begTimeUTC: string;
-  endTimeUTC: string;
+  begDate: Date;
+  endDate: Date;
   subclasses: string[];
 };
 
 const initialSubclassFilter: SubclassFilter = {
-  begTimeUTC: null,
-  endTimeUTC: null,
+  begDate: null,
+  endDate: null,
   subclasses: [],
 };
 
@@ -33,6 +33,25 @@ export function SubclassFilterService() {
         newList.push(subc);
       }
       setSubclassFilter({ ...getSubclassFilter(), subclasses: newList });
+    },
+
+    toggleAll(allSubclasses: string[]) {
+      const currentList = getSubclassFilter();
+      if (currentList.subclasses.length === allSubclasses.length) {
+        setSubclassFilter({ ...getSubclassFilter(), subclasses: [] });
+      } else {
+        setSubclassFilter({
+          ...getSubclassFilter(),
+          subclasses: allSubclasses,
+        });
+      }
+    },
+
+    setBegDate(newDate: Date) {
+      setSubclassFilter({ ...getSubclassFilter(), begDate: newDate });
+    },
+    setEndDate(newDate: Date) {
+      setSubclassFilter({ ...getSubclassFilter(), endDate: newDate });
     },
   };
 }

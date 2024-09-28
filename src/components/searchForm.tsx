@@ -1,8 +1,11 @@
-import { TextField } from "@kobalte/core/text-field";
 import { Button } from "./ui/button";
 import { createSignal } from "solid-js";
 import { useNavigate } from "@solidjs/router";
-import { TextFieldErrorMessage } from "./ui/text-field";
+import {
+  TextField,
+  TextFieldErrorMessage,
+  TextFieldInput,
+} from "./ui/text-field";
 import { DataSource, dataSourceInfo } from "~/lib/dataSource";
 import { RecentSearchesService } from "~/lib/recentSearches";
 import { useService } from "solid-services";
@@ -48,7 +51,7 @@ export default function SearchForm() {
         <form>
           <div>
             <TextField validationState={inputIsInvalid() ? "invalid" : "valid"}>
-              <TextField.Input
+              <TextFieldInput
                 type="search"
                 class="outline-none rounded-lg border-2 bg-transparent text-2xl p-3"
                 value={searchVal()}

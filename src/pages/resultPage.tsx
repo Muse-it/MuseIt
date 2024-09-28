@@ -1,19 +1,29 @@
 import { useParams } from "@solidjs/router";
-import { Match, Switch, createSignal } from "solid-js";
+import { Match, Switch, createEffect, createSignal } from "solid-js";
+import { useService } from "solid-services";
 import { DatapointDisplay } from "~/components/datapointsDisplay";
 import ErrorCard from "~/components/errorCard";
 import LoadingSpinner from "~/components/loadingSpinner";
 import { PlotOptions } from "~/components/plotOptions";
 import { SubclassSelect } from "~/components/subclassSelect";
-import { createSearchQuery } from "~/lib/apiSignals";
+import { createGenerateQuery, createSearchQuery } from "~/lib/apiSignals";
 import { DataSource, dataSourceInfo } from "~/lib/dataSource";
+import { SubclassFilterService } from "~/lib/subclassFilter";
 
 export default function ResultPage() {
   const params = useParams();
   const source = params.source as DataSource;
   const searchText = params.search as string;
 
+  const subclassFilter = useService(SubclassFilterService);
+
   const searchQuery = createSearchQuery(source, searchText);
+  const genQuery = createGenerateQuery(source, subclassFilter().subclassFilter);
+
+  function doRefetch() {
+    genQuery.refetch();
+    console.log(genQuery.status);
+  }
 
   function TitleElement() {
     return (
@@ -32,6 +42,7 @@ export default function ResultPage() {
     <div>
       <TitleElement />
       <div style={{ display: "grid", "grid-template-columns": "1fr 5fr" }}>
+        {/* Subclass Filter */}
         <Switch>
           <Match when={searchQuery.isPending}>
             <LoadingSpinner />
@@ -42,13 +53,39 @@ export default function ResultPage() {
             />
           </Match>
           <Match when={searchQuery.isSuccess}>
-            <SubclassSelect subclasses={searchQuery.data} />
+            <SubclassSelect
+              allSubclasses={searchQuery.data}
+              triggerRefetch={doRefetch}
+            />
           </Match>
         </Switch>
-        <div>
-          <PlotOptions />
-          <DatapointDisplay />
-        </div>
+
+        {/* Generated Data */}
+        <Switch>
+          <Match when={genQuery.isPending}>
+            <div class="mt-10 flex justify-center">
+              <div class="text-2xl">Submit a filter to start generating.</div>
+            </div>
+          </Match>
+          <Match when={genQuery.isFetching}>
+            <div class="flex flex-col justify-start mt-10 align-middle place-items-center">
+              <div class="my-5">Running...</div>
+              <LoadingSpinner />
+            </div>
+          </Match>
+          <Match when={genQuery.isError}>
+            <ErrorCard
+              errorText={`Could not make search query: ${searchQuery.error.message}`}
+            />
+          </Match>
+          <Match when={genQuery.isSuccess}>
+            <div>
+              {JSON.stringify(subclassFilter().subclassFilter)}
+              <PlotOptions />
+              <DatapointDisplay />
+            </div>
+          </Match>
+        </Switch>
       </div>
     </div>
   );
