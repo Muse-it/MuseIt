@@ -1,4 +1,4 @@
-import { createWithSignal } from "solid-zustand";
+import { createSignal } from "solid-js";
 
 export type Subclass = [string, number];
 
@@ -8,54 +8,31 @@ export type SubclassFilter = {
   subclasses: string[];
 };
 
-interface SubclassFilterState {
-  subclassFilter: SubclassFilter;
-  setBegTime: (newTime: string) => void;
-  setEndTime: (newTime: string) => void;
-  toggleSubclass: (toggledSubclass: string) => void;
-}
-
-const initialSubclassFilter = {
+const initialSubclassFilter: SubclassFilter = {
   begTimeUTC: null,
   endTimeUTC: null,
   subclasses: [],
 };
-export const subclassFilterStore = createWithSignal<SubclassFilterState>(
-  (set) =>
-    ({
-      // Recent Searches State
-      subclassFilter: initialSubclassFilter,
-      setBegTime: (newTime) =>
-        set((state) => ({
-          subclassFilter: {
-            ...state.subclassFilter,
-            begTimeUTC: newTime,
-          },
-        })),
-      setEndTime: (newTime) =>
-        set((state) => ({
-          subclassFilter: {
-            ...state.subclassFilter,
-            endTimeUTC: newTime,
-          },
-        })),
-      toggleSubclass: (toggledSubclass) =>
-        set((state) => {
-          let newSubclasses = state.subclassFilter.subclasses;
-          if (newSubclasses.includes(toggledSubclass)) {
-            let delIdx = newSubclasses.findIndex(
-              (val) => val === toggledSubclass
-            );
-            newSubclasses.splice(delIdx, 1);
-          } else {
-            newSubclasses.push(toggledSubclass);
-          }
-          return {
-            subclassFilter: {
-              ...state.subclassFilter,
-              subclasses: newSubclasses,
-            },
-          };
-        }),
-    } as SubclassFilterState)
-);
+
+export function SubclassFilterService() {
+  const [getSubclassFilter, setSubclassFilter] = createSignal<SubclassFilter>(
+    initialSubclassFilter
+  );
+
+  return {
+    get subclassFilter() {
+      return getSubclassFilter();
+    },
+
+    toggleSubclass(subc: string) {
+      let newList = getSubclassFilter().subclasses;
+      if (newList.includes(subc)) {
+        let delIdx = newList.findIndex((val) => val === subc);
+        console.log("deleted:", newList.splice(delIdx, 1));
+      } else {
+        newList.push(subc);
+      }
+      setSubclassFilter({ ...getSubclassFilter(), subclasses: newList });
+    },
+  };
+}

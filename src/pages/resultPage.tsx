@@ -7,7 +7,6 @@ import { PlotOptions } from "~/components/plotOptions";
 import { SubclassSelect } from "~/components/subclassSelect";
 import { createSearchQuery } from "~/lib/apiSignals";
 import { DataSource, dataSourceInfo } from "~/lib/dataSource";
-import { SubclassFilter, subclassFilterStore } from "~/lib/subclassFilter";
 
 export default function ResultPage() {
   const params = useParams();

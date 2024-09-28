@@ -9,7 +9,8 @@ Rewrite of MuseIt frontend. Tech stack, in summary:
 - `Tailwind CSS`: inline css for this smaller project
 - `solid-ui`: component library, based on shadcn
   - the components in `src/components/ui` are all added via the solid-ui cli
-- `solid-zustand`: store based state management
+- `solid-service`: dependency injection based state management
+  - tried `solid-zustand` and `@nanostores/solid`... never forget `:')`
 - `solid-query`: async query management based from Tanstack Query
 
 ## Things to note

@@ -1,45 +1,42 @@
-import { For } from "solid-js";
 import { Card } from "./ui/card";
-import { Subclass, subclassFilterStore } from "~/lib/subclassFilter";
-
-function SubclassTile(props: {
-  subclass: Subclass;
-  isSelected: boolean;
-  toggleSubclass: () => void;
-}) {
-  const colorPalette = props.isSelected ? "success" : "error";
-
-  return (
-    <div class="m-1 p-1 flex place-items-center">
-      <div class="flex-grow">{props.subclass[0]}</div>
-      <button
-        onClick={() => props.toggleSubclass()}
-        class={` ml-2 p-2 rounded-md bg-${colorPalette}-foreground/35 hover:bg-${colorPalette}-foreground/75 transition-colors duration-300`}
-      >
-        {props.subclass[1]}
-      </button>
-    </div>
-  );
-}
+import { Subclass, SubclassFilterService } from "~/lib/subclassFilter";
+import { useService } from "solid-services";
 
 export function SubclassSelect(props: { subclasses: Subclass[] }) {
-  const subclassFilter = subclassFilterStore((s) => s.subclassFilter);
-  const toggleSubclass = subclassFilterStore((s) => s.toggleSubclass);
+  const subclassFilterService = useService(SubclassFilterService);
+
+  function onClickSubclass(subclass: string) {
+    subclassFilterService().toggleSubclass(subclass);
+  }
 
   return (
     <div>
       <Card class="flex flex-col m-2 p-2">
         <div>Time Control</div>
         <div>
-          <For each={props.subclasses}>
-            {(subc) => (
-              <SubclassTile
-                subclass={subc}
-                isSelected={subclassFilter().subclasses.includes(subc[0])}
-                toggleSubclass={() => toggleSubclass(subc[0])}
-              />
-            )}
-          </For>
+          {props.subclasses.map((subc) => {
+            const isSelected =
+              subclassFilterService().subclassFilter.subclasses.includes(
+                subc[0]
+              );
+            return (
+              <div>
+                <div class="m-1 p-1 flex place-items-center">
+                  <div class="flex-grow">{subc[0]}</div>
+                  <button
+                    onClick={() => onClickSubclass(subc[0])}
+                    class={"ml-2 p-2 rounded-md transition-colors duration-300"}
+                    classList={{
+                      "bg-error-foreground/40": !isSelected,
+                      "bg-success-foreground/40": isSelected,
+                    }}
+                  >
+                    {subc[1]}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </Card>
     </div>

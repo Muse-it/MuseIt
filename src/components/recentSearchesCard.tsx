@@ -1,7 +1,9 @@
 import { For, Show } from "solid-js";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
-import { recentSearchesStore } from "~/lib/recentSearches";
+import { useStore } from "@nanostores/solid";
+import { useService } from "solid-services";
+import { RecentSearchesService } from "~/lib/recentSearches";
 
 function RecentSearchTile(props: { search: string }) {
   return (
@@ -12,25 +14,27 @@ function RecentSearchTile(props: { search: string }) {
 }
 
 export default function RecentSearchesCard() {
-  const rSearches = recentSearchesStore((s) => s.rSearches);
-  const clearRSearches = recentSearchesStore((s) => s.clearRSearches);
+  const recentSearchesService = useService(RecentSearchesService);
 
   return (
     <div class="">
       <Card class="m-4 p-8" style={{ "min-height": "50vh" }}>
         <div class="flex items-center">
           <h1 class="text-3xl font-bold m-4">Recent Searches</h1>
-          <Button variant="ghost" onClick={clearRSearches}>
+          <Button
+            variant="ghost"
+            onClick={() => recentSearchesService().clearRSearches()}
+          >
             Clear Searches
           </Button>
         </div>
         <div>
-          <Show when={rSearches().length > 0}>
-            <For each={rSearches()}>
+          <Show when={recentSearchesService().recentSearches.length > 0}>
+            <For each={recentSearchesService().recentSearches}>
               {(item, index) => <RecentSearchTile search={item} />}
             </For>
           </Show>
-          <Show when={rSearches().length <= 0}>
+          <Show when={recentSearchesService().recentSearches.length <= 0}>
             <RecentSearchTile search="No Recent Searches!" />
           </Show>
         </div>

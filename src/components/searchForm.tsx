@@ -1,11 +1,11 @@
 import { TextField } from "@kobalte/core/text-field";
 import { Button } from "./ui/button";
-import { AiOutlineReddit } from "solid-icons/ai";
 import { createSignal } from "solid-js";
-import { recentSearchesStore } from "~/lib/recentSearches";
 import { useNavigate } from "@solidjs/router";
 import { TextFieldErrorMessage } from "./ui/text-field";
 import { DataSource, dataSourceInfo } from "~/lib/dataSource";
+import { RecentSearchesService } from "~/lib/recentSearches";
+import { useService } from "solid-services";
 
 function SearchButton(props: {
   source: DataSource;
@@ -27,14 +27,14 @@ function SearchButton(props: {
 }
 
 export default function SearchForm() {
-  const addRSearch = recentSearchesStore((s) => s.addRSearch);
   const [searchVal, setSearchVal] = createSignal<string>(null);
   const navigate = useNavigate();
-  let inputField: any;
+  // const rSearches = useStore(recentSearches);
+  const recentSearchesService = useService(RecentSearchesService);
 
   function doSearch(source: DataSource) {
     if (inputIsInvalid()) return;
-    addRSearch(searchVal());
+    recentSearchesService().addRSearch(searchVal());
     navigate(`/result/${source}/${searchVal()}`);
   }
 
@@ -43,17 +43,16 @@ export default function SearchForm() {
   }
 
   return (
-    <div class="flex justify-center items-center">
-      <div class="flex flex-col items-center">
+    <div class="flex justify-center">
+      <div class="mt-20">
         <form>
           <div>
             <TextField validationState={inputIsInvalid() ? "invalid" : "valid"}>
               <TextField.Input
-                ref={inputField}
                 type="search"
                 class="outline-none rounded-lg border-2 bg-transparent text-2xl p-3"
                 value={searchVal()}
-                onChange={(e) => setSearchVal(e.currentTarget.value)}
+                onInput={(e) => setSearchVal(e.currentTarget.value)}
               />
               <TextFieldErrorMessage class="mt-2 mb-3">
                 Search field is empty
