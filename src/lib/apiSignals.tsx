@@ -4,8 +4,8 @@ import { mockMetadata, mockSearch } from "./mockData";
 import { SubclassFilter } from "./subclassFilter";
 
 const hours24inMs = 1000 * 60 * 60 * 24;
-const baseUrl = "";
-const mockDelayMs = 3000;
+const baseUrl = "http://localhost:5000";
+const mockDelayMs = 1000;
 
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -24,6 +24,15 @@ abstract class RedditClient {
     if (!result.ok) throw new Error("Failed to fetch data");
     return result.json();
   }
+  static async makePlotQuery(filename: string, query: string) {
+    console.log("fetching", `${baseUrl}/plots/${query}/${filename}`);
+    const result = await fetch(`${baseUrl}/plots/${query}/${filename}`);
+    if (!result.ok) throw new Error("Failed to fetch data");
+    return result.text();
+  }
+  static getPlotURL(filename: string, query: string) {
+    return `${baseUrl}/plots/${query}/${filename}`;
+  }
 }
 
 abstract class MockClient {
@@ -33,10 +42,23 @@ abstract class MockClient {
     return result;
   }
   static async makeGenerateQuery(subclassFilter: SubclassFilter) {
-    console.log();
     await delay(mockDelayMs);
     const result = mockMetadata;
     return result;
+  }
+  static async makePlotQuery(filename: string, query: string) {
+    console.log("fetching", `${baseUrl}/plots/${query}/${filename}`);
+    const result = await fetch(
+      `${baseUrl}/plots/${"Depression Music"}/${filename}`,
+      {
+        mode: "no-cors",
+      }
+    );
+    if (!result.ok) throw new Error("Failed to fetch data");
+    return result.text();
+  }
+  static getPlotURL(filename: string, query: string) {
+    return `${baseUrl}/plots/${"Depression Music"}/${filename}`;
   }
 }
 
@@ -65,7 +87,6 @@ export function createGenerateQuery(
   source: DataSource,
   subclassFilter: SubclassFilter
 ) {
-  console.log(`${source}_${JSON.stringify(subclassFilter)}_generate`);
   function chooseClient(): Promise<any> {
     switch (source) {
       case "reddit":
@@ -85,4 +106,53 @@ export function createGenerateQuery(
   }));
 
   return genQuery;
+}
+
+export function createPlotQuery(
+  source: DataSource,
+  filename: string,
+  query: string
+) {
+  console.log(filename);
+  function chooseClient(): Promise<any> {
+    switch (source) {
+      case "reddit":
+        return RedditClient.makePlotQuery(filename, query);
+      case "mock":
+        return MockClient.makePlotQuery(filename, query);
+      default:
+        return source satisfies never;
+    }
+  }
+
+  const plotQuery = createQuery(() => ({
+    queryKey: [`${source}_${filename}_${query}_plot`],
+    queryFn: () => chooseClient(),
+    staleTime: hours24inMs,
+  }));
+
+  return plotQuery;
+}
+
+export function navigateToPlot(
+  source: DataSource,
+  filename: string,
+  query: string
+) {
+  let plotURL: string;
+  switch (source) {
+    case "reddit":
+      plotURL = RedditClient.getPlotURL(filename, query);
+      break;
+    case "mock":
+      plotURL = MockClient.getPlotURL(filename, query);
+      break;
+    default:
+      return source satisfies never;
+  }
+  window.open(
+    plotURL,
+    "_blank",
+    "location=yes,height=500,width=570,scrollbars=yes,status=yes"
+  );
 }

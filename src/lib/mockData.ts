@@ -1,3 +1,4 @@
+import { TMetadata } from "./metadata";
 import { Subclass } from "./subclassFilter";
 
 export const mockSearch: Subclass[] = [
@@ -159,7 +160,7 @@ export const mockSearch: Subclass[] = [
   ["yandere", 1],
 ];
 
-export const mockMetadata = {
+export const mockMetadata: TMetadata = {
   subreddit: {
     0: "teenagers",
     1: "teenagers",

@@ -80,9 +80,12 @@ export default function ResultPage() {
           </Match>
           <Match when={genQuery.isSuccess}>
             <div>
-              {JSON.stringify(subclassFilter().subclassFilter)}
-              <PlotOptions />
-              <DatapointDisplay />
+              <PlotOptions
+                source={source}
+                metadata={genQuery.data}
+                search={searchText}
+              />
+              <DatapointDisplay metadata={genQuery.data} />
             </div>
           </Match>
         </Switch>

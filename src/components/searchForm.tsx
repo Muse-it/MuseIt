@@ -1,5 +1,5 @@
 import { Button } from "./ui/button";
-import { createSignal } from "solid-js";
+import { Signal, createSignal } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import {
   TextField,
@@ -18,7 +18,7 @@ function SearchButton(props: {
     <div class="flex justify-center">
       <Button
         onclick={props.onClick}
-        class="hover:bg-accent hover:text-accent-foreground rounded-full text-xl m-4 px-7 py-6"
+        class="hover:bg-accent hover:text-accent-foreground rounded-full text-xl mx-4 my-1 px-7 py-6"
       >
         Search with {dataSourceInfo[props.source].displayName}
         <span class="ml-2 text-3xl">
@@ -29,8 +29,8 @@ function SearchButton(props: {
   );
 }
 
-export default function SearchForm() {
-  const [searchVal, setSearchVal] = createSignal<string>(null);
+export default function SearchForm(props: { searchSignal: Signal<string> }) {
+  const [searchVal, setSearchVal] = props.searchSignal;
   const navigate = useNavigate();
   // const rSearches = useStore(recentSearches);
   const recentSearchesService = useService(RecentSearchesService);
@@ -49,7 +49,7 @@ export default function SearchForm() {
     <div class="flex justify-center">
       <div class="mt-20">
         <form>
-          <div>
+          <div class="mb-8">
             <TextField validationState={inputIsInvalid() ? "invalid" : "valid"}>
               <TextFieldInput
                 type="search"

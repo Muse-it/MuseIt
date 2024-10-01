@@ -1,7 +1,6 @@
-import { For, Show } from "solid-js";
+import { For, Setter, Show } from "solid-js";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
-import { useStore } from "@nanostores/solid";
 import { useService } from "solid-services";
 import { RecentSearchesService } from "~/lib/recentSearches";
 
@@ -13,7 +12,9 @@ function RecentSearchTile(props: { search: string }) {
   );
 }
 
-export default function RecentSearchesCard() {
+export default function RecentSearchesCard(props: {
+  setSearch: Setter<string>;
+}) {
   const recentSearchesService = useService(RecentSearchesService);
 
   return (
@@ -31,7 +32,11 @@ export default function RecentSearchesCard() {
         <div>
           <Show when={recentSearchesService().recentSearches.length > 0}>
             <For each={recentSearchesService().recentSearches}>
-              {(item, index) => <RecentSearchTile search={item} />}
+              {(item, index) => (
+                <div onClick={() => props.setSearch(item)}>
+                  <RecentSearchTile search={item} />
+                </div>
+              )}
             </For>
           </Show>
           <Show when={recentSearchesService().recentSearches.length <= 0}>
