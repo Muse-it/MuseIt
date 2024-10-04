@@ -13,7 +13,7 @@ import { SubclassFilterService } from "~/lib/subclassFilter";
 export default function ResultPage() {
   const params = useParams();
   const source = params.source as DataSource;
-  const searchText = params.search as string;
+  const searchText = decodeURIComponent(params.search as string);
 
   const subclassFilter = useService(SubclassFilterService);
 
@@ -32,7 +32,7 @@ export default function ResultPage() {
           <span class="text-muted-foreground">
             Searching with {dataSourceInfo[source].displayName}:{" "}
           </span>
-          <span class="font-mono">{params.search}</span>
+          <span class="font-mono">{searchText}</span>
         </div>
       </div>
     );

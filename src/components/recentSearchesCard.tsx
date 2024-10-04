@@ -3,6 +3,7 @@ import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { useService } from "solid-services";
 import { RecentSearchesService } from "~/lib/recentSearches";
+import { RiSystemDeleteBin6Line } from "solid-icons/ri";
 
 function RecentSearchTile(props: { search: string }) {
   return (
@@ -22,12 +23,15 @@ export default function RecentSearchesCard(props: {
       <Card class="m-4 p-8" style={{ "min-height": "50vh" }}>
         <div class="flex items-center">
           <h1 class="text-3xl font-bold m-4">Recent Searches</h1>
-          <Button
-            variant="ghost"
-            onClick={() => recentSearchesService().clearRSearches()}
-          >
-            Clear Searches
-          </Button>
+          <div class=" flex-1 text-right">
+            <Button
+              variant="ghost"
+              class="text-error-foreground"
+              onClick={() => recentSearchesService().clearRSearches()}
+            >
+              <RiSystemDeleteBin6Line />
+            </Button>
+          </div>
         </div>
         <div>
           <Show when={recentSearchesService().recentSearches.length > 0}>

@@ -14,10 +14,10 @@ export default function ColorModeToggle() {
   }
 
   return (
-    <li class="text-sm flex items-center space-x-1 ml-auto absolute right-4">
+    <div class="text-right">
       <Button class="text-xl" variant="ghost" onClick={() => toggleColorMode()}>
         {colorMode() === "light" ? <FiMoon /> : <FiSun />}
       </Button>
-    </li>
+    </div>
   );
 }
