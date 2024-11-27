@@ -9,6 +9,7 @@ import {
   PlotWindows,
   getEnumValues,
   getFilename,
+  isWindowDisabled,
 } from "~/lib/plotTypes";
 import { navigateToPlot } from "~/lib/apiSignals";
 import {
@@ -33,6 +34,9 @@ export function PlotOptions(props: {
     const filename = getFilename(plotConfig());
     console.log("filename: ", filename);
     navigateToPlot(props.source, getFilename(plotConfig()), props.search);
+  }
+  function downloadCSV() {
+    navigateToPlot(props.source, "metadata.csv", props.search);
   }
   return (
     <Card class="m-2 p-4">
@@ -62,10 +66,7 @@ export function PlotOptions(props: {
         <span class="m-3"> as </span>
         <div>
           <Select
-            disabled={
-              plotConfig().type === PlotTypes.hierarchical_topics ||
-              plotConfig().type === PlotTypes.topics_visualization
-            }
+            disabled={isWindowDisabled(plotConfig().type)}
             class="flex flex-col align-middle"
             value={plotConfig().window}
             onChange={(newVal) =>
@@ -86,6 +87,9 @@ export function PlotOptions(props: {
         </div>
         <span class="m-3" />
         <Button onClick={showPlot}>Generate Plot</Button>
+        <Button class="ml-3" onClick={downloadCSV} variant="secondary">
+          Download Data
+        </Button>
       </div>
     </Card>
   );

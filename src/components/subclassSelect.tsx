@@ -2,21 +2,27 @@ import { Card } from "./ui/card";
 import { Subclass, SubclassFilterService } from "~/lib/subclassFilter";
 import { useService } from "solid-services";
 import { TextField, TextFieldInput } from "./ui/text-field";
-import { createSignal } from "solid-js";
 import { Button } from "./ui/button";
 import { TbSelectAll } from "solid-icons/tb";
+
+function formatForDateInput(d: Date | null) {
+  if (d === null) {
+    return "yyyy-mm-dd";
+  }
+  return d.toISOString().substring(0, 10);
+}
 
 export function SubclassSelect(props: {
   allSubclasses: Subclass[];
   triggerRefetch: () => void;
 }) {
   const subclassFilterService = useService(SubclassFilterService);
-  const [startDate, setStartDate] = createSignal(
-    new Date(Date.now()).toISOString()
-  );
-  const [endDate, setEndDate] = createSignal(
-    new Date(Date.now()).toISOString()
-  );
+  // const [startDate, setStartDate] = createSignal(
+  //   new Date(Date.now()).toISOString()
+  // );
+  // const [endDate, setEndDate] = createSignal(
+  //   new Date(Date.now()).toISOString()
+  // );
 
   function selectAllSubclasses() {
     const allSubclassNames = props.allSubclasses.map((s) => s[0]);
@@ -32,7 +38,8 @@ export function SubclassSelect(props: {
         <div class="flex m-3">
           <Button
             variant="secondary"
-            class="flex-grow"
+            // flashButton class added in src/index.css at @layer components
+            class="flex-grow flashButton shadow-secondary-foreground"
             onClick={props.triggerRefetch}
           >
             Submit Filter
@@ -48,9 +55,14 @@ export function SubclassSelect(props: {
             <TextField>
               <TextFieldInput
                 type="date"
-                value={startDate()}
+                value={formatForDateInput(
+                  subclassFilterService().subclassFilter.begDate
+                )}
                 onInput={(e) => {
-                  setStartDate(e.currentTarget.value);
+                  console.log(e.currentTarget.value);
+                  subclassFilterService().setBegDate(
+                    new Date(e.currentTarget.value)
+                  );
                 }}
               />
             </TextField>
@@ -58,9 +70,13 @@ export function SubclassSelect(props: {
             <TextField>
               <TextFieldInput
                 type="date"
-                value={endDate()}
+                value={formatForDateInput(
+                  subclassFilterService().subclassFilter.endDate
+                )}
                 onInput={(e) => {
-                  setEndDate(e.currentTarget.value);
+                  subclassFilterService().setEndDate(
+                    new Date(e.currentTarget.value)
+                  );
                 }}
               />
             </TextField>

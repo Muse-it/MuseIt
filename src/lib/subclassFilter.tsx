@@ -3,8 +3,8 @@ import { createSignal } from "solid-js";
 export type Subclass = [string, number];
 
 export type SubclassFilter = {
-  begDate: Date;
-  endDate: Date;
+  begDate: Date | null;
+  endDate: Date | null;
   subclasses: string[];
 };
 

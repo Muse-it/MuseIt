@@ -98,6 +98,23 @@
   }
 }
 
+@layer components {
+  @keyframes flashButtonAnim {
+    0% {
+      box-shadow: none;
+    }
+    50% {
+      box-shadow: 0 0 20px 3px;
+    }
+    100% {
+      box-shadow: none;
+    }
+  }
+  .flashButton {
+    animation: flashButtonAnim 2s ease-in-out forwards;
+  }
+}
+
 @layer base {
   * {
     @apply border-border;

@@ -2,8 +2,20 @@ export enum PlotTypes {
   emotion = "emotion",
   sentiment = "sentiment",
   topics = "topics",
+
+  // window disabled:
   hierarchical_topics = "hierarchical_topics",
   topics_visualization = "topics_visualization",
+  wordcloud = "wordcloud",
+}
+
+export function isWindowDisabled(type: PlotTypes) {
+  const windowDisabledFor = [
+    PlotTypes.hierarchical_topics,
+    PlotTypes.topics_visualization,
+    PlotTypes.wordcloud,
+  ];
+  return windowDisabledFor.includes(type);
 }
 
 export function getEnumValues(obj) {
@@ -42,6 +54,8 @@ export function getFilename(conf: PlotConfig) {
   ) {
     // return `${getEnumValues(PlotTypes)[conf.type]}.html`;
     return `${conf.type}.html`;
+  } else if (conf.type == PlotTypes.wordcloud) {
+    return `${conf.type}.png`;
   } else {
     return `${conf.type}_${conf.window}.html`;
   }
