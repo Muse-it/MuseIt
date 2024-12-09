@@ -16,7 +16,7 @@ export default function NavBar() {
             <NavBarLink path="/">Home</NavBarLink>
           </li>
           <li class="py-2 px-4">
-            <NavBarLink path="/about">About</NavBarLink>
+            <NavBarLink path="/settings">Settings</NavBarLink>
           </li>
         </ul>
         <div class="flex-1">

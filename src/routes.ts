@@ -9,8 +9,8 @@ export const routes: RouteDefinition[] = [
     component: HomePage,
   },
   {
-    path: "/about",
-    component: lazy(() => import("./pages/aboutPage")),
+    path: "/settings",
+    component: lazy(() => import("./pages/settingsPage")),
   },
   {
     path: "/result/:source/:search",

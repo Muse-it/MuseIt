@@ -1,4 +1,4 @@
-import { For } from "solid-js";
+import { For, Match, Switch } from "solid-js";
 import { Card } from "./ui/card";
 import { TMetadata } from "~/lib/metadata";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
@@ -8,57 +8,106 @@ import { useService } from "solid-services";
 import { SubclassFilterService } from "~/lib/subclassFilter";
 import { Button } from "./ui/button";
 import { ImSpotify } from "solid-icons/im";
+import { ImReddit } from "solid-icons/im";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "./ui/collapsible";
-import { parseArgs } from "util";
+import { useParams } from "@solidjs/router";
+import { DataSource } from "~/lib/dataSource";
 
 export function DatapointDisplay(props: { metadata: TMetadata }) {
   const subclassFilter = useService(SubclassFilterService);
   const m = props.metadata;
-
+  const params = useParams();
+  const dataSource = params.source as DataSource;
   function doesMatchFilter(idx: string): boolean {
+    let doesMatchDate: boolean = true;
     const createdDate = new Date(m.created_utc[idx]);
     if (
       subclassFilter().subclassFilter.begDate !== null &&
       subclassFilter().subclassFilter.endDate !== null
     ) {
-      return (
+      doesMatchDate =
         createdDate >= subclassFilter().subclassFilter.begDate &&
-        createdDate <= subclassFilter().subclassFilter.endDate
-      );
+        createdDate <= subclassFilter().subclassFilter.endDate;
     }
-    return true;
+
+    let doesMatchSubclass: boolean = true;
+    const subcs = subclassFilter().subclassFilter.subclasses;
+    if (subcs.length > 0) {
+      if (dataSource == "reddit") {
+        if (!subcs.includes(m.subreddit[idx])) {
+          doesMatchSubclass = false;
+        }
+      }
+    }
+
+    return doesMatchDate && doesMatchSubclass;
   }
 
   function navigateToLink(url: string) {
     console.log(url);
     window.open(url);
   }
+  function getBody(idx: number | string) {
+    if (`${m.body[idx]}` == "NaN")
+      return <div class="italic">No Body Text</div>;
+    else return <div>{m.body[idx]}</div>;
+  }
 
   function infoDisplay(idx: string) {
+    function infoDisplayHeading(text: string) {
+      return <p class="text-xl font-bold">{text}</p>;
+    }
+
+    function infoLine(key: string, text: string) {
+      return (
+        <div class="flex">
+          <p class="italic">{key}</p>
+          <p>{`: ${text}`}</p>
+        </div>
+      );
+    }
+
+    function linkRow(linkURL: string) {
+      return (
+        <div class="flex place-items-center">
+          <Switch fallback={<div />}>
+            <Match when={linkURL.search("reddit.com") != -1}>
+              <ImReddit class="text-reddit" />
+            </Match>
+            <Match when={linkURL.search("spotify.com") != -1}>
+              <ImSpotify class="text-success-foreground" />
+            </Match>
+          </Switch>
+          <Button variant="link" onClick={() => navigateToLink(linkURL)}>
+            {linkURL}
+          </Button>
+        </div>
+      );
+    }
+
     const jsonString = (m.all_links[idx] as string).replaceAll("'", `"`);
     const linkList = JSON.parse(jsonString) as string[];
+    console.log(linkList);
     return (
-      <Card class="ml-10 p-3">
+      <Card class="ml-10 p-3 shadow-none">
         <div>
           <div>
-            <For each={linkList}>
-              {(linkURL) => {
-                return (
-                  <div>
-                    <Button
-                      variant="link"
-                      onClick={() => navigateToLink(linkURL)}
-                    >
-                      {linkURL}
-                    </Button>
-                  </div>
-                );
-              }}
-            </For>
+            {infoDisplayHeading("Info: ")}
+            {infoLine("Number of comments", m.num_comments[idx])}
+            {infoLine("Topics", m.topics[idx])}
+            {infoLine("Emotion", m.emotion[idx])}
+          </div>
+          <div class="mt-5">
+            {infoDisplayHeading("All links: ")}
+            <For each={linkList}>{linkRow}</For>
+          </div>
+          <div class="mt-5">
+            {infoDisplayHeading("Body: ")}
+            <p class="text-muted-foreground">{getBody(idx)}</p>
           </div>
         </div>
       </Card>
@@ -66,12 +115,6 @@ export function DatapointDisplay(props: { metadata: TMetadata }) {
   }
 
   function DatapointTile(idx: string) {
-    function getBody() {
-      if (`${m.body[idx]}` == "NaN")
-        return <div class="italic">No Body Text</div>;
-      else return <div>{m.body[idx]}</div>;
-    }
-
     function getSentiment() {
       const sentiment = m.sentiment[idx];
       switch (sentiment) {
@@ -110,7 +153,7 @@ export function DatapointDisplay(props: { metadata: TMetadata }) {
                 </div>
                 <div class="font-bold text-lg">{m.title[idx]}</div>
                 <div class="text-sm text-muted-foreground line-clamp-1 text-ellipsis">
-                  {getBody()}
+                  {getBody(idx)}
                 </div>
               </div>
               {/* <div class="self-center mr-3">
@@ -144,8 +187,6 @@ export function DatapointDisplay(props: { metadata: TMetadata }) {
           {(val) => {
             if (doesMatchFilter(val)) {
               return DatapointTile(val);
-            } else {
-              return <div />;
             }
           }}
         </For>

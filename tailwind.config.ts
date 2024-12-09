@@ -12,6 +12,9 @@ module.exports = {
     },
     extend: {
       colors: {
+        // Custom:
+        reddit: "hsl(var(--reddit))",
+
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

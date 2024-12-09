@@ -49,6 +49,9 @@
 
     min-height: 100vh;
     max-height: 100vh;
+
+    /* Custom */
+    --reddit: 16, 100%, 50%;
   }
 
   .dark,
@@ -95,6 +98,9 @@
     --ring: 240 4.9% 83.9%;
 
     --radius: 0.5rem;
+
+    /* Custom */
+    --reddit: 16, 100%, 58%;
   }
 }
 

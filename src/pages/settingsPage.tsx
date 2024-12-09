@@ -1,9 +1,9 @@
-export default function AboutPage() {
+export default function SettingsPage() {
   return (
     <div class="p-8">
-      <div class="flex">
+      <div class="mt-20 flex">
         <div class="mr-3">
-          <h1 class="text-3xl font-bold">MuseIt</h1>
+          <h1 class="text-3xl font-bold">About MuseIt</h1>
 
           <p class="mt-4">A tool to explore and visualise online music data.</p>
 
