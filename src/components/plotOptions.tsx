@@ -22,7 +22,7 @@ import {
 
 export function PlotOptions(props: {
   search: string;
-  metadata: TMetadata;
+  metadata: TMetadata | null;
   source: DataSource;
 }) {
   const [plotConfig, setPlotConfig] = createSignal<PlotConfig>({
@@ -38,6 +38,11 @@ export function PlotOptions(props: {
   function downloadCSV() {
     navigateToPlot(props.source, "metadata.csv", props.search);
   }
+
+  if (props.metadata === null) {
+    return <div></div>;
+  }
+
   return (
     <Card class="m-2 p-4">
       <div class="flex align-middle">

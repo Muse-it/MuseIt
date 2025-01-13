@@ -1,7 +1,7 @@
-export default function SettingsPage() {
+export default function AboutPage() {
   return (
     <div class="p-8">
-      <div class="mt-20 flex">
+      <div class="mt-6 flex">
         <div class="mr-3">
           <h1 class="text-3xl font-bold">About MuseIt</h1>
 
@@ -9,8 +9,8 @@ export default function SettingsPage() {
 
           <h3 class="mt-12 text-2xl font-bold">Instructions to download</h3>
           <p class="mt-2">
-            When a plot opens, plotly generated plots will a download button in
-            the top-left
+            When a plot opens, plotly generated plots will have a download
+            button in the top-right to download as png (camera icon)
           </p>
           <p class="mt-3">{"For generated images, right-click -> Save as"}</p>
         </div>

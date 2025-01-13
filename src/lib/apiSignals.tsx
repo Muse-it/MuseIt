@@ -1,9 +1,10 @@
 import { createQuery } from "@tanstack/solid-query";
 import { DataSource } from "./dataSource";
 import { mockMetadata, mockSearch } from "./mockData";
-import { SubclassFilter } from "./subclassFilter";
+import { SubclassFilter, formatDate as formatDate } from "./subclassFilter";
+import { TMetadata } from "./metadata";
 
-const hours24inMs = 1000 * 60 * 60 * 24;
+export const hours24inMs = 1000 * 60 * 60 * 24;
 const baseUrl = "http://localhost:5000";
 const mockDelayMs = 1000;
 
@@ -11,42 +12,79 @@ function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// these abstract classes never instantiated, they're only used to encapsulate api details and methods.
+// this interface is used to encapsulate api client details and methods.
+// client objects will be of Client type
+interface APIClient {
+  makeSearchQuery(searchText: string);
+  makeGenerateQuery(
+    subclassFilter: SubclassFilter,
+    query: string
+  ): Promise<TMetadata>;
+  makePlotQuery(filename: string, query: string);
+  getPlotURL(filename: string, query: string);
+}
 
-abstract class RedditClient {
-  static async makeSearchQuery(searchText: string) {
+const redditClient: APIClient = {
+  async makeSearchQuery(searchText: string) {
     const result = await fetch(`${baseUrl}/query/${searchText}`);
     if (!result.ok) throw new Error("Failed to fetch data");
     return result.json();
-  }
-  static async makeGenerateQuery(subclassFilter: SubclassFilter) {
-    const result = await fetch(`${baseUrl}/generate`);
+  },
+  async makeGenerateQuery(subclassFilter: SubclassFilter, query: string) {
+    if (subclassFilter.subclasses.length <= 0) {
+      throw new Error("No subclasses to search");
+    }
+    var begDate = subclassFilter.begDate;
+    var endDate = subclassFilter.endDate;
+    if (endDate == null) {
+      endDate = new Date();
+    }
+    if (begDate == null) {
+      begDate = new Date(endDate);
+      begDate.setFullYear(begDate.getFullYear() - 1);
+    }
+    const result = await fetch(`${baseUrl}/generate`, {
+      method: "POST",
+      body: JSON.stringify({
+        query: query,
+        list_of_subreddits: subclassFilter.subclasses,
+        start_date: formatDate(begDate),
+        end_date: formatDate(endDate),
+        comments_flag: false,
+      }),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+    });
     if (!result.ok) throw new Error("Failed to fetch data");
-    return result.json();
-  }
-  static async makePlotQuery(filename: string, query: string) {
-    console.log("fetching", `${baseUrl}/plots/${query}/${filename}`);
-    const result = await fetch(`${baseUrl}/plots/${query}/${filename}`);
+    const resultJson = (await result.json()) as TMetadata;
+    return resultJson;
+  },
+  async makePlotQuery(filename: string, query: string) {
+    // console.log("fetching", `${baseUrl}/plots/${query}/${filename}`);
+    const result = await fetch(`${baseUrl}/plots/${query}/${filename}`, {
+      mode: "no-cors",
+    });
     if (!result.ok) throw new Error("Failed to fetch data");
     return result.text();
-  }
-  static getPlotURL(filename: string, query: string) {
+  },
+  getPlotURL(filename: string, query: string) {
     return `${baseUrl}/plots/${query}/${filename}`;
-  }
-}
+  },
+};
 
-abstract class MockClient {
-  static async makeSearchQuery(searchText: string) {
+const mockClient: APIClient = {
+  async makeSearchQuery(searchText: string) {
     await delay(mockDelayMs);
     const result = mockSearch;
     return result;
-  }
-  static async makeGenerateQuery(subclassFilter: SubclassFilter) {
+  },
+  async makeGenerateQuery(subclassFilter: SubclassFilter) {
     await delay(mockDelayMs);
     const result = mockMetadata;
     return result;
-  }
-  static async makePlotQuery(filename: string, query: string) {
+  },
+  async makePlotQuery(filename: string, query: string) {
     console.log("fetching", `${baseUrl}/plots/${query}/${filename}`);
     const result = await fetch(
       `${baseUrl}/plots/${"Depression Music"}/${filename}`,
@@ -56,82 +94,21 @@ abstract class MockClient {
     );
     if (!result.ok) throw new Error("Failed to fetch data");
     return result.text();
-  }
-  static getPlotURL(filename: string, query: string) {
+  },
+  getPlotURL(filename: string, query: string) {
     return `${baseUrl}/plots/${"Depression Music"}/${filename}`;
+  },
+};
+
+export function chooseClient(source: DataSource): APIClient {
+  switch (source) {
+    case "reddit":
+      return redditClient;
+    case "mock":
+      return mockClient;
+    default:
+      return source satisfies never;
   }
-}
-
-export function createSearchQuery(source: DataSource, searchText: string) {
-  function chooseClient(): Promise<any> {
-    switch (source) {
-      case "reddit":
-        return RedditClient.makeSearchQuery(searchText);
-      case "mock":
-        return MockClient.makeSearchQuery(searchText);
-      default:
-        return source satisfies never;
-    }
-  }
-
-  const searchQuery = createQuery(() => ({
-    queryKey: [`${source}_${searchText}_search`],
-    queryFn: () => chooseClient(),
-    staleTime: hours24inMs,
-  }));
-
-  return searchQuery;
-}
-
-export function createGenerateQuery(
-  source: DataSource,
-  subclassFilter: SubclassFilter
-) {
-  function chooseClient(): Promise<any> {
-    switch (source) {
-      case "reddit":
-        return RedditClient.makeGenerateQuery(subclassFilter);
-      case "mock":
-        return MockClient.makeGenerateQuery(subclassFilter);
-      default:
-        return source satisfies never;
-    }
-  }
-
-  const genQuery = createQuery(() => ({
-    queryKey: [`${source}_${subclassFilter}_generate`],
-    queryFn: () => chooseClient(),
-    staleTime: hours24inMs,
-    enabled: subclassFilter.subclasses.length > 0,
-  }));
-
-  return genQuery;
-}
-
-export function createPlotQuery(
-  source: DataSource,
-  filename: string,
-  query: string
-) {
-  console.log(filename);
-  function chooseClient(): Promise<any> {
-    switch (source) {
-      case "reddit":
-        return RedditClient.makePlotQuery(filename, query);
-      case "mock":
-        return MockClient.makePlotQuery(filename, query);
-      default:
-        return source satisfies never;
-    }
-  }
-
-  const plotQuery = createQuery(() => ({
-    queryKey: [`${source}_${filename}_${query}_plot`],
-    queryFn: () => chooseClient(),
-    staleTime: hours24inMs,
-  }));
-
-  return plotQuery;
 }
 
 export function navigateToPlot(
@@ -140,16 +117,7 @@ export function navigateToPlot(
   query: string
 ) {
   let plotURL: string;
-  switch (source) {
-    case "reddit":
-      plotURL = RedditClient.getPlotURL(filename, query);
-      break;
-    case "mock":
-      plotURL = MockClient.getPlotURL(filename, query);
-      break;
-    default:
-      return source satisfies never;
-  }
+  plotURL = chooseClient(source).getPlotURL(filename, query);
   window.open(
     plotURL,
     "_blank",

@@ -16,6 +16,7 @@ import {
 } from "./ui/collapsible";
 import { useParams } from "@solidjs/router";
 import { DataSource } from "~/lib/dataSource";
+import { GenerateSpinner } from "~/pages/resultPage";
 
 export function DatapointDisplay(props: { metadata: TMetadata }) {
   const subclassFilter = useService(SubclassFilterService);
@@ -89,8 +90,13 @@ export function DatapointDisplay(props: { metadata: TMetadata }) {
       );
     }
 
-    const jsonString = (m.all_links[idx] as string).replaceAll("'", `"`);
-    const linkList = JSON.parse(jsonString) as string[];
+    console.log(m);
+    console.log(m.all_links[idx]);
+    console.log(m.all_links[idx] as string);
+
+    // const jsonString = (m.all_links[idx] as string).replaceAll("'", `"`);
+    // const linkList = JSON.parse(jsonString) as string[];
+    const linkList = m.all_links[idx] as string[];
     console.log(linkList);
     return (
       <Card class="ml-10 p-3 shadow-none">
@@ -135,6 +141,10 @@ export function DatapointDisplay(props: { metadata: TMetadata }) {
           <div class={`min-w-3`} />
         </div>
       );
+    }
+
+    if (props.metadata == null) {
+      return <GenerateSpinner />;
     }
 
     return (

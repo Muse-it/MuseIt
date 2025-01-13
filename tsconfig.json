@@ -17,6 +17,8 @@
       "~/*": [
         "./src/*"
       ]
-    }
+    },
+    // breakpoints don't work without this
+    "sourceMap": true
   }
 }

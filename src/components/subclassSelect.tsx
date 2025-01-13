@@ -1,16 +1,13 @@
 import { Card } from "./ui/card";
-import { Subclass, SubclassFilterService } from "~/lib/subclassFilter";
+import {
+  Subclass,
+  SubclassFilterService,
+  formatDate,
+} from "~/lib/subclassFilter";
 import { useService } from "solid-services";
 import { TextField, TextFieldInput } from "./ui/text-field";
 import { Button } from "./ui/button";
 import { TbSelectAll } from "solid-icons/tb";
-
-function formatForDateInput(d: Date | null) {
-  if (d === null) {
-    return "yyyy-mm-dd";
-  }
-  return d.toISOString().substring(0, 10);
-}
 
 export function SubclassSelect(props: {
   allSubclasses: Subclass[];
@@ -28,6 +25,13 @@ export function SubclassSelect(props: {
     const allSubclassNames = props.allSubclasses.map((s) => s[0]);
     subclassFilterService().toggleAll(allSubclassNames);
   }
+  function submitFilter() {
+    if (subclassFilterService().subclassFilter.subclasses.length <= 0) {
+      alert("Subclass list is empty!");
+      return;
+    }
+    props.triggerRefetch();
+  }
 
   return (
     <div>
@@ -40,7 +44,7 @@ export function SubclassSelect(props: {
             variant="secondary"
             // flashButton class added in src/index.css at @layer components
             class="flex-grow flashButton shadow-secondary-foreground"
-            onClick={props.triggerRefetch}
+            onClick={submitFilter}
           >
             Submit Filter
           </Button>
@@ -52,10 +56,11 @@ export function SubclassSelect(props: {
         <div>
           <div class="m-1 p-1 shadow-none">
             <span>Start at: </span>
+            <p class="text-xs italic">defaults to one year before End Date</p>
             <TextField>
               <TextFieldInput
                 type="date"
-                value={formatForDateInput(
+                value={formatDate(
                   subclassFilterService().subclassFilter.begDate
                 )}
                 onInput={(e) => {
@@ -67,10 +72,11 @@ export function SubclassSelect(props: {
               />
             </TextField>
             <span>End at: </span>
+            <p class="text-xs italic">defaults to today</p>
             <TextField>
               <TextFieldInput
                 type="date"
-                value={formatForDateInput(
+                value={formatDate(
                   subclassFilterService().subclassFilter.endDate
                 )}
                 onInput={(e) => {

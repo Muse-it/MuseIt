@@ -1,12 +1,13 @@
 import { useParams } from "@solidjs/router";
-import { Match, Switch, createEffect, createSignal } from "solid-js";
+import { createQuery } from "@tanstack/solid-query";
+import { Match, Switch, createSignal } from "solid-js";
 import { useService } from "solid-services";
 import { DatapointDisplay } from "~/components/datapointsDisplay";
 import ErrorCard from "~/components/errorCard";
 import LoadingSpinner from "~/components/loadingSpinner";
 import { PlotOptions } from "~/components/plotOptions";
 import { SubclassSelect } from "~/components/subclassSelect";
-import { createGenerateQuery, createSearchQuery } from "~/lib/apiSignals";
+import { chooseClient, hours24inMs } from "~/lib/apiSignals";
 import { DataSource, dataSourceInfo } from "~/lib/dataSource";
 import { SubclassFilterService } from "~/lib/subclassFilter";
 
@@ -16,12 +17,38 @@ export default function ResultPage() {
   const searchText = decodeURIComponent(params.search as string);
 
   const subclassFilter = useService(SubclassFilterService);
+  const [isGenEnabled, setIsGenEnabled] = createSignal(false);
 
-  const searchQuery = createSearchQuery(source, searchText);
-  const genQuery = createGenerateQuery(source, subclassFilter().subclassFilter);
+  const searchQuery = createQuery(() => ({
+    queryKey: [`${source}_${searchText}_search`],
+    queryFn: () => chooseClient(source).makeSearchQuery(searchText),
+    staleTime: hours24inMs,
+  }));
+  const genQuery = createQuery(() => ({
+    queryKey: [`${source}_${searchText}_${subclassFilter}_generate`],
+    queryFn: () =>
+      chooseClient(source).makeGenerateQuery(
+        subclassFilter().subclassFilter,
+        searchText
+      ),
+    staleTime: hours24inMs,
+    enabled: isGenEnabled(),
+    // placeholderData: null,
+    retry: false,
+    retryOnMount: false,
+    refetchInterval: hours24inMs,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+  }));
 
   function doRefetch() {
-    genQuery.refetch();
+    if (isGenEnabled()) {
+      genQuery.refetch();
+    } else {
+      setIsGenEnabled(true);
+    }
+    console.log(genQuery.fetchStatus);
     console.log(genQuery.status);
   }
 
@@ -62,15 +89,12 @@ export default function ResultPage() {
 
         {/* Generated Data */}
         <Switch>
+          <Match when={genQuery.isFetching}>
+            <GenerateSpinner />
+          </Match>
           <Match when={genQuery.isPending}>
             <div class="mt-10 flex justify-center">
               <div class="text-2xl">Submit a filter to start generating.</div>
-            </div>
-          </Match>
-          <Match when={genQuery.isFetching}>
-            <div class="flex flex-col justify-start mt-10 align-middle place-items-center">
-              <div class="my-5">Running...</div>
-              <LoadingSpinner />
             </div>
           </Match>
           <Match when={genQuery.isError}>
@@ -93,3 +117,17 @@ export default function ResultPage() {
     </div>
   );
 }
+
+export const GenerateSpinner = () => (
+  <div class="flex flex-col mt-10 align-middle place-items-center">
+    <LoadingSpinner />
+    <p class="mt-5">Running query...</p>
+    <p>
+      This may take a while. Open the backend console to monitor query progress.
+    </p>
+    <p class="text-xs mt-3">
+      If the required models are not cached then the backend should start a
+      download as well
+    </p>
+  </div>
+);

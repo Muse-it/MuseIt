@@ -9,6 +9,7 @@ import {
 import { DataSource, dataSourceInfo } from "~/lib/dataSource";
 import { RecentSearchesService } from "~/lib/recentSearches";
 import { useService } from "solid-services";
+import { SubclassFilterService } from "~/lib/subclassFilter";
 
 function SearchButton(props: {
   source: DataSource;
@@ -34,14 +35,17 @@ export default function SearchForm(props: { searchSignal: Signal<string> }) {
   const navigate = useNavigate();
   // const rSearches = useStore(recentSearches);
   const recentSearchesService = useService(RecentSearchesService);
+  const subclassFilterService = useService(SubclassFilterService);
 
   function doSearch(source: DataSource) {
     if (inputIsInvalid()) return;
+    subclassFilterService().setSubclassesList([]);
     recentSearchesService().addRSearch(searchVal());
     navigate(`/result/${source}/${searchVal()}`);
   }
 
   function inputIsInvalid() {
+    // TODO: only allow valid filenames (disallow special characters entirely??)
     return searchVal() === null || searchVal().length <= 0;
   }
 

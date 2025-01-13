@@ -14,6 +14,13 @@ const initialSubclassFilter: SubclassFilter = {
   subclasses: [],
 };
 
+export function formatDate(d: Date | null) {
+  if (d === null) {
+    return "yyyy-mm-dd";
+  }
+  return d.toISOString().substring(0, 10);
+}
+
 export function SubclassFilterService() {
   const [getSubclassFilter, setSubclassFilter] = createSignal<SubclassFilter>(
     initialSubclassFilter
@@ -52,6 +59,11 @@ export function SubclassFilterService() {
     },
     setEndDate(newDate: Date) {
       setSubclassFilter({ ...getSubclassFilter(), endDate: newDate });
+    },
+    setSubclassesList(newList: string[]) {
+      console.log(getSubclassFilter());
+      setSubclassFilter({ ...getSubclassFilter(), subclasses: newList });
+      console.log(getSubclassFilter());
     },
   };
 }

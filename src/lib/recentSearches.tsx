@@ -26,6 +26,9 @@ export function RecentSearchesService() {
     },
 
     addRSearch(newSearch: string) {
+      if (getRecentSearches().includes(newSearch)) {
+        return;
+      }
       const newState = [...getRecentSearches(), newSearch];
       setRecentSearchesInLocalStorage(newState);
       setRecentSearches(newState);

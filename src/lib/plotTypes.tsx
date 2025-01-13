@@ -7,6 +7,7 @@ export enum PlotTypes {
   hierarchical_topics = "hierarchical_topics",
   topics_visualization = "topics_visualization",
   wordcloud = "wordcloud",
+  topic_txts = "topic_txts",
 }
 
 export function isWindowDisabled(type: PlotTypes) {
@@ -14,6 +15,7 @@ export function isWindowDisabled(type: PlotTypes) {
     PlotTypes.hierarchical_topics,
     PlotTypes.topics_visualization,
     PlotTypes.wordcloud,
+    PlotTypes.topic_txts,
   ];
   return windowDisabledFor.includes(type);
 }
@@ -56,6 +58,8 @@ export function getFilename(conf: PlotConfig) {
     return `${conf.type}.html`;
   } else if (conf.type == PlotTypes.wordcloud) {
     return `${conf.type}.png`;
+  } else if (conf.type == PlotTypes.topic_txts) {
+    return `${conf.type}.zip`;
   } else {
     return `${conf.type}_${conf.window}.html`;
   }

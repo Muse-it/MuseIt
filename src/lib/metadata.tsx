@@ -1,4 +1,4 @@
-type NumberKeyedObj = { [key: number]: string | number };
+type NumberKeyedObj = { [key: number]: string | number | string[] };
 
 // assumes that all [NumberKeyedObjs] are equal in length
 export type TMetadata = {
