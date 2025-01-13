@@ -1,4 +1,4 @@
-# MuseIt
+# MuseIt-Frontend
 
 Rewrite of MuseIt frontend. Tech stack, in summary:
 
@@ -7,17 +7,21 @@ Rewrite of MuseIt frontend. Tech stack, in summary:
 - `Vite`: fast build tooling
 - `SolidJS`: performant, easier to debug and mildly cleaner
 - `Tailwind CSS`: inline css for this smaller project
-- `solid-ui`: component library, based on shadcn
+- `solid-ui`: component library, based on `shadcn`
   - the components in `src/components/ui` are all added via the solid-ui cli
 - `solid-service`: dependency injection based state management
-  - tried `solid-zustand` and `@nanostores/solid`... never forget `:')`
-- `solid-query`: async query management based from Tanstack Query
+  - messed around with `solid-zustand` and `@nanostores/solid` for way too long (over-engineering avoided?)
+- `solid-query`: async query management from Tanstack Query
 
 ## Things to note
 
-**Filepath based Routing**
+**Routing**
 
 Not enforced but ideally pages go in `src/pages` and added to `src/routes.ts`
+
+### IMPORTANT: Ensure no routes are the same between the frontend and the backend.
+
+Reason: All routes that don't match the specified backend routes will be served directly. If the browser requests a route that is specified in the backend, the response will be served.
 
 ## Template Info
 
@@ -42,14 +46,14 @@ You can learn more about it on the [`@solidjs/router` repository](https://github
 
 In the project directory, you can run:
 
-### `npm run dev` or `npm start`
+### `pnpm run dev` or `pnpm start`
 
 Runs the app in the development mode.<br>
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 The page will reload if you make edits.<br>
 
-### `npm run build`
+### `pnpm run build`
 
 Builds the app for production to the `dist` folder.<br>
 It correctly bundles Solid in production mode and optimizes the build for the best performance.
