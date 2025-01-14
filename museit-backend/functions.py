@@ -1,4 +1,5 @@
 import datetime
+import shutil
 
 import praw
 import pandas as pd
@@ -241,15 +242,17 @@ def save_all_plots(folder_name,df):
         fig = topic_model.visualize_topics()
         fig.write_html(f'{folder_name}/topics_visualization.html')
 
+        # topic txts and zip
         topic_txts=pd.DataFrame({'topic': topics, 'document': data})
         topic_folder = os.path.join(folder_name, 'topics_txts')
         os.makedirs(topic_folder, exist_ok=True)
-
         for topic_id in range(topic_txts['topic'].max() + 1):
             if topic_id < 20:  # Only save topics less than 20
                 topic_docs = topic_txts[topic_txts['topic'] == topic_id]['document']
                 with open(f'{topic_folder}/topic_{topic_id}.txt', 'w', encoding='utf-8') as f:
                     f.write('\n'.join(topic_docs))
+        shutil.make_archive(os.path.join(folder_name, 'topic_txts'), 'zip', topic_folder)
+
 
     except Exception as e:
         print(f"Error generating hierarchical topics: {e}")
@@ -259,6 +262,8 @@ def save_all_plots(folder_name,df):
         for j in listy:
             temporal_filename = f'{folder_name}/{i}_time_series_{j}.html'
             plot_time_series(df, 'created_utc', i, freq=j).write_html(temporal_filename)
+
+
 
 
 # -------- Old version --------

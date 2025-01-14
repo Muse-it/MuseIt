@@ -3,9 +3,9 @@ Flask server backend that contains AI things used by MuseIt. Also serves the fro
 
 ## How to run
 
-1. Initialise a conda environment from the provided `original_environment.yml` [ref](https://stackoverflow.com/a/48016620). (the author prefers [mamba](https://mamba.readthedocs.io/en/latest/installation/mamba-installation.html)/[micromamba](https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html) over conda, but conda also works)
+1. Initialise a conda environment from the provided `<os>_environment.yml`, use the appropriate yml file for you OS [ref](https://stackoverflow.com/a/48016620). (the author prefers [mamba](https://mamba.readthedocs.io/en/latest/installation/mamba-installation.html)/[micromamba](https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html) over conda, but conda also works)
    ```
-   conda env create --name museit --file=original_environment.yml
+   conda env create --name museit --file=<os>_env.yml
    ```
 
    The install/download can take a while.
