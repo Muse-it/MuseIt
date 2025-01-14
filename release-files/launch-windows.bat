@@ -1,5 +1,4 @@
-start .\routes.exe
 start http://localhost:5000/
+start .\routes.exe
 
-timeout 2 >nul
 exit
