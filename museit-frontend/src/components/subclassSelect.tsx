@@ -8,6 +8,8 @@ import { useService } from "solid-services";
 import { TextField, TextFieldInput } from "./ui/text-field";
 import { Button } from "./ui/button";
 import { TbSelectAll } from "solid-icons/tb";
+import { Checkbox } from "./ui/checkbox";
+import { Label } from "./ui/lablel";
 
 export function SubclassSelect(props: {
   allSubclasses: Subclass[];
@@ -53,7 +55,7 @@ export function SubclassSelect(props: {
         {/* 
           Time Control
         */}
-        <div>
+        <div class="mb-5">
           <div class="m-1 p-1 shadow-none">
             <span>Start at: </span>
             <p class="text-xs italic">defaults to one year before End Date</p>
@@ -88,7 +90,28 @@ export function SubclassSelect(props: {
             </TextField>
           </div>
         </div>
-        <br />
+
+        {/* 
+          Checkboxes
+        */}
+        <div class="flex items-center space-x-2 mb-5">
+          <Checkbox checked={subclassFilterService().subclassFilter.withComments} onClick={() => {subclassFilterService().setWithComments(!subclassFilterService().subclassFilter.withComments)}}/>
+          <div class="grid gap-1.5 leading-none">
+            <Label for="terms1-input">Include comments?</Label>
+            <p class="text-error text-xs">
+              If you include comments, query will take a much longer time (few hours extra)
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center space-x-2 mb-5">
+          <Checkbox checked={subclassFilterService().subclassFilter.onlyScraping} onClick={() => {subclassFilterService().setOnlyScraping(!subclassFilterService().subclassFilter.onlyScraping)}}/>
+          <div class="grid gap-1.5 leading-none">
+            <Label for="terms1-input">Only scraping?</Label>
+            <p class="text-xs">
+              Will skip modelling tasks and only give scraping results.
+            </p>
+          </div>
+        </div>
 
         {/* 
           Subclasses

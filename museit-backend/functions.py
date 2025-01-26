@@ -38,32 +38,34 @@ def get_comments_for_submission(submission):
     for comment in submission.comments.list():
         comments.append(comment.body)
     return comments
+
 def subreddits_posts_and_comments_given_query(query, list_of_subreddits, start_date, end_date,comments_flag=False):
     # Return the data as a DataFrame
 
     print("Reddit API called from Function subreddits_posts_and_comments_given_query")
     posts = pd.DataFrame()
-    all_subs = "+".join(list_of_subreddits)
-    if comments_flag:
-        print("with comments")
-    print("searching reddit in r/: ", "\n-".join(list_of_subreddits))
-    for submission in tqdm(reddit.subreddit(all_subs).search(query, limit=None)):
-        created_utc = datetime.datetime.fromtimestamp(submission.created_utc)
-        if start_date <= created_utc.date() <= end_date:
-            if comments_flag:
-                comments = get_comments_for_submission(submission)
-            else:
-                comments=[]
-            posts = posts.append({
-                'subreddit': submission.subreddit.display_name,
-                'title': submission.title,
-                'body': submission.selftext,
-                'url': submission.url,
-                'created_utc': created_utc,
-                'num_comments': submission.num_comments,
-                'comments': comments
-            }, ignore_index=True)
+    for subreddit in list_of_subreddits:
+        for submission in tqdm(reddit.subreddit(subreddit).search(query, limit=None)):
+            created_utc = datetime.datetime.fromtimestamp(submission.created_utc)
+            if start_date <= created_utc.date() <= end_date:
+                #comments = get_comments_for_submission(submission)
+                #comments=[]
+                if comments_flag:
+                    comments = get_comments_for_submission(submission)
+                else:
+                    comments=[]
+                posts = posts.append({
+                    'subreddit': subreddit,
+                    'title': submission.title,
+                    'body': submission.selftext,
+                    'url': submission.url,
+                    'created_utc': created_utc,
+                    'num_comments': submission.num_comments,
+                    'comments': comments,
+                    'reddit_permalink': f"https://reddit.com{submission.permalink}"
+                }, ignore_index=True)
     return posts
+
 
 ###########################################################################
 ########################### tweetnlp and models ###########################

@@ -6,7 +6,7 @@ import { TMetadata } from "./metadata";
 
 export const hours24inMs = 1000 * 60 * 60 * 24;
 const baseUrl = "http://localhost:5000";
-const mockDelayMs = 1000;
+const mockDelayMs = 500;
 
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));

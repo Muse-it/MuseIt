@@ -6,12 +6,16 @@ export type SubclassFilter = {
   begDate: Date | null;
   endDate: Date | null;
   subclasses: string[];
+  withComments: boolean;
+  onlyScraping: boolean,
 };
 
 const initialSubclassFilter: SubclassFilter = {
   begDate: null,
   endDate: null,
   subclasses: [],
+  withComments: false,
+  onlyScraping: false,
 };
 
 export function formatDate(d: Date | null) {
@@ -54,6 +58,12 @@ export function SubclassFilterService() {
       }
     },
 
+    setWithComments(newBool: boolean) {
+      setSubclassFilter({...getSubclassFilter(), withComments: newBool});
+    },
+    setOnlyScraping(newBool: boolean) {
+      setSubclassFilter({...getSubclassFilter(), onlyScraping: newBool});
+    },
     setBegDate(newDate: Date) {
       setSubclassFilter({ ...getSubclassFilter(), begDate: newDate });
     },
@@ -61,9 +71,7 @@ export function SubclassFilterService() {
       setSubclassFilter({ ...getSubclassFilter(), endDate: newDate });
     },
     setSubclassesList(newList: string[]) {
-      console.log(getSubclassFilter());
       setSubclassFilter({ ...getSubclassFilter(), subclasses: newList });
-      console.log(getSubclassFilter());
     },
   };
 }

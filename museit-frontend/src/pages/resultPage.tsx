@@ -66,7 +66,7 @@ export default function ResultPage() {
   }
 
   return (
-    <div>
+    <div class="max-w-full">
       <TitleElement />
       <div style={{ display: "grid", "grid-template-columns": "1fr 5fr" }}>
         {/* Subclass Filter */}
@@ -93,8 +93,9 @@ export default function ResultPage() {
             <GenerateSpinner />
           </Match>
           <Match when={genQuery.isPending}>
-            <div class="mt-10 flex justify-center">
-              <div class="text-2xl">Submit a filter to start generating.</div>
+            <div class="mt-10 place-items-center">
+              <div class="text-3xl">Submit a filter to start generating.</div>
+              <div class="text-xl">Note: If a search yields low number of results, then hierarchical_topics and topic_visualization plots won't be available.</div>
             </div>
           </Match>
           <Match when={genQuery.isError}>
