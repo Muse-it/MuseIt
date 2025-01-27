@@ -70,7 +70,8 @@ def scrape():
 #     ],
 #     "start_date": "2022-01-01",
 #     "end_date": "2024-12-31",
-#     "comments_flag": true
+#     "comments_flag": true,
+#     "metadata_flag": true
 # }
 @app.route('/generate', methods=['POST'])
 def scrape_with_metadata():
@@ -87,21 +88,24 @@ def scrape_with_metadata():
     if type(end_date) == str:
         end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
     comments_flag = data.get('comments_flag')
-
+    metadata_flag = data.get('metadata_flag')
     if not all([query, list_of_subreddits, start_date, end_date]):
         return jsonify({'error': 'Missing parameters'}), 400
     print(query,list_of_subreddits,start_date,end_date,comments_flag)
     posts = subreddits_posts_and_comments_given_query(query, list_of_subreddits, start_date, end_date, comments_flag)
-    metadata = generate_metadata(posts)
-    if metadata.empty:
-        return metadata.to_dict()
-    #save the metadata to a file in a folder named query and name the file metadata.csv
     import os
     path_to_save = f'plots/{query}'
     if not os.path.exists(path_to_save):
         os.makedirs(path_to_save)
-    metadata.to_csv(f'{path_to_save}/metadata.csv', index=False)
-    save_all_plots(f"{path_to_save}",metadata)
+    if metadata_flag:
+        metadata = generate_metadata(posts)
+        metadata.to_csv(f'{path_to_save}/metadata.csv', index=False)
+        save_all_plots(f"{path_to_save}",metadata)
+    else:
+        metadata = process_text_to_spotify_links(posts)
+        metadata.to_csv(f'{path_to_save}/metadata.csv', index=False)
+    if metadata.empty:
+        return metadata.to_dict()
     return metadata.to_dict()
 
 # @app.route('/plots/<query>', methods=['GET'])
