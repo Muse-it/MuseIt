@@ -91,7 +91,7 @@ def scrape_with_metadata():
     metadata_flag = data.get('metadata_flag')
     if not all([query, list_of_subreddits, start_date, end_date]):
         return jsonify({'error': 'Missing parameters'}), 400
-    print(query,list_of_subreddits,start_date,end_date,comments_flag)
+    print(query,list_of_subreddits,start_date,end_date, comments_flag, metadata_flag)
     posts = subreddits_posts_and_comments_given_query(query, list_of_subreddits, start_date, end_date, comments_flag)
     import os
     path_to_save = f'plots/{query}'

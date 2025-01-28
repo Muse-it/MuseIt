@@ -98,8 +98,8 @@ export function SubclassSelect(props: {
           <Checkbox checked={subclassFilterService().subclassFilter.withComments} onClick={() => {subclassFilterService().setWithComments(!subclassFilterService().subclassFilter.withComments)}}/>
           <div class="grid gap-1.5 leading-none">
             <Label for="terms1-input">Include comments?</Label>
-            <p class="text-error text-xs">
-              If you include comments, query will take a much longer time (few hours extra)
+            <p class="text-xs">
+              Enable if comments are to be included in NLP analysis; <span class="text-error-foreground">Will cause the query to take much longer</span>
             </p>
           </div>
         </div>
@@ -108,7 +108,7 @@ export function SubclassSelect(props: {
           <div class="grid gap-1.5 leading-none">
             <Label for="terms1-input">Only scraping?</Label>
             <p class="text-xs">
-              Will skip modelling tasks and only give scraping results.
+              Will skip modelling and analysis tasks and only give scraping results.
             </p>
           </div>
         </div>

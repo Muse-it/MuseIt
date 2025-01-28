@@ -18,6 +18,7 @@ import { useParams } from "@solidjs/router";
 import { DataSource } from "~/lib/dataSource";
 import { GenerateSpinner } from "~/pages/resultPage";
 
+// TODO: need to refactor this to be compatible with other data sources; currently assumes reddit
 export function DatapointDisplay(props: { metadata: TMetadata }) {
   const subclassFilter = useService(SubclassFilterService);
   const m = props.metadata;
@@ -63,11 +64,14 @@ export function DatapointDisplay(props: { metadata: TMetadata }) {
       return <p class="text-xl font-bold">{text}</p>;
     }
 
-    function infoLine(key: string, text: string) {
+    function infoLine(label: string, key: string) {
+      if (!(key in m)) {
+        return <div></div>;
+      }
       return (
         <div class="flex">
-          <p class="italic">{key}</p>
-          <p>{`: ${text}`}</p>
+          <p class="italic">{label}</p>
+          <p>{`: ${m[key][idx]}`}</p>
         </div>
       );
     }
@@ -84,15 +88,13 @@ export function DatapointDisplay(props: { metadata: TMetadata }) {
             </Match>
           </Switch>
           <Button variant="link" onClick={() => navigateToLink(linkURL)}>
-            {linkURL}
+            <p class="text-ellipsis overflow-hidden whitespace-nowrap max-w-[50vw]">
+              {linkURL}
+            </p>
           </Button>
         </div>
       );
     }
-
-    console.log(m);
-    console.log(m.all_links[idx]);
-    console.log(m.all_links[idx] as string);
 
     // const jsonString = (m.all_links[idx] as string).replaceAll("'", `"`);
     // const linkList = JSON.parse(jsonString) as string[];
@@ -103,17 +105,19 @@ export function DatapointDisplay(props: { metadata: TMetadata }) {
         <div>
           <div>
             {infoDisplayHeading("Info: ")}
-            {infoLine("Number of comments", m.num_comments[idx])}
-            {infoLine("Topics", m.topics[idx])}
-            {infoLine("Emotion", m.emotion[idx])}
+            {infoLine("Number of comments", "num_comments")}
+            {infoLine("Topics", "topics")}
+            {infoLine("Emotion", "emotion")}
           </div>
           <div class="mt-5">
             {infoDisplayHeading("All links: ")}
             <For each={linkList}>{linkRow}</For>
+            {infoDisplayHeading("Permalink: ")}
+            {linkRow(m.reddit_permalink[idx])}
           </div>
           <div class="mt-5">
             {infoDisplayHeading("Body: ")}
-            <p class="text-muted-foreground">{getBody(idx)}</p>
+            <p class="text-muted-foreground max-w-full" style={{"word-wrap": "break-word"}}>{getBody(idx)}</p>
           </div>
         </div>
       </Card>
@@ -122,6 +126,9 @@ export function DatapointDisplay(props: { metadata: TMetadata }) {
 
   function DatapointTile(idx: string) {
     function getSentiment() {
+      if (!("sentiment" in m)) {
+        return <div></div>;
+      }
       const sentiment = m.sentiment[idx];
       switch (sentiment) {
         case "positive":
@@ -148,45 +155,47 @@ export function DatapointDisplay(props: { metadata: TMetadata }) {
     }
 
     return (
-      <Collapsible>
-        <CollapsibleTrigger class="text-left w-full ">
-          <div
-            class="shadow-none hover:shadow-md  p-2 hover:bg-secondary rounded"
-            onClick={() => {}}
-          >
-            <div class="flex align-middle">
-              <div class="text-xl self-center">{idx}</div>
-              {separator()}
-              <div class="flex-grow">
-                <div class="text-info text-xs">
-                  Posted to r/{m.subreddit[idx]} on {m.created_utc[idx]}
-                </div>
-                <div class="font-bold text-lg">{m.title[idx]}</div>
-                <div class="text-sm text-muted-foreground line-clamp-1 text-ellipsis">
-                  {getBody(idx)}
-                </div>
-              </div>
-              {/* <div class="self-center mr-3">
-            <Button
-              variant="secondary"
-              onClick={() => navigateToLink(m.spotify_links[idx])}
+      <div class="max-w-full">
+        <Collapsible>
+          <CollapsibleTrigger class="text-left w-full ">
+            <div
+              class="shadow-none hover:shadow-md  p-2 hover:bg-secondary rounded"
+              onClick={() => {}}
             >
+              <div class="flex align-middle">
+                <div class="text-xl self-center">{idx}</div>
+                {separator()}
+                <div class="flex-grow">
+                  <div class="text-info text-xs">
+                    Posted to r/{m.subreddit[idx]} on {m.created_utc[idx]}
+                  </div>
+                  <div class="font-bold text-lg">{m.title[idx]}</div>
+                  <div class="text-sm text-muted-foreground line-clamp-1 text-ellipsis">
+                    {getBody(idx)}
+                  </div>
+                </div>
+                {/* <div class="self-center mr-3">
+            <Button
+            variant="secondary"
+              onClick={() => navigateToLink(m.spotify_links[idx])}
+              >
               <ImSpotify />
             </Button>
           </div> */}
-              <div class="text-2xl self-center">
-                <Tooltip>
-                  <TooltipTrigger>
-                    <div>{getSentiment()}</div>
-                  </TooltipTrigger>
-                  <TooltipContent>Sentiment</TooltipContent>
-                </Tooltip>
+                <div class="text-2xl self-center">
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <div>{getSentiment()}</div>
+                    </TooltipTrigger>
+                    <TooltipContent>Sentiment</TooltipContent>
+                  </Tooltip>
+                </div>
               </div>
             </div>
-          </div>
-        </CollapsibleTrigger>
-        <CollapsibleContent>{infoDisplay(idx)}</CollapsibleContent>
-      </Collapsible>
+          </CollapsibleTrigger>
+          <CollapsibleContent>{infoDisplay(idx)}</CollapsibleContent>
+        </Collapsible>
+      </div>
     );
   }
 

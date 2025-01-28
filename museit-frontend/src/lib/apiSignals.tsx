@@ -50,7 +50,8 @@ const redditClient: APIClient = {
         list_of_subreddits: subclassFilter.subclasses,
         start_date: formatDate(begDate),
         end_date: formatDate(endDate),
-        comments_flag: false,
+        comments_flag: subclassFilter.withComments,
+        metadata_flag: !subclassFilter.onlyScraping,
       }),
       headers: {
         "Content-type": "application/json; charset=UTF-8",

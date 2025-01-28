@@ -21,4 +21,5 @@ export type TMetadata = {
   merged_text: NumberKeyedObj;
   all_links: NumberKeyedObj;
   spotify_links: NumberKeyedObj;
+  reddit_permalink: NumberKeyedObj;
 };

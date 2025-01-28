@@ -44,7 +44,8 @@ def subreddits_posts_and_comments_given_query(query, list_of_subreddits, start_d
 
     print("Reddit API called from Function subreddits_posts_and_comments_given_query")
     posts = pd.DataFrame()
-    for subreddit in list_of_subreddits:
+    for sub_idx, subreddit in enumerate(list_of_subreddits):
+        print(f"querying subreddit {sub_idx+1}/{len(list_of_subreddits)}")
         for submission in tqdm(reddit.subreddit(subreddit).search(query, limit=None)):
             created_utc = datetime.datetime.fromtimestamp(submission.created_utc)
             if start_date <= created_utc.date() <= end_date:
