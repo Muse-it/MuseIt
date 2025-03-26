@@ -52,6 +52,7 @@ const redditClient: APIClient = {
         end_date: formatDate(endDate),
         comments_flag: subclassFilter.withComments,
         metadata_flag: !subclassFilter.onlyScraping,
+        spotdl_flag: subclassFilter.withSpotdlScraping,
       }),
       headers: {
         "Content-type": "application/json; charset=UTF-8",

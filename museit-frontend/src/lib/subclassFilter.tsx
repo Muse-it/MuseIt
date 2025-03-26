@@ -7,7 +7,8 @@ export type SubclassFilter = {
   endDate: Date | null;
   subclasses: string[];
   withComments: boolean;
-  onlyScraping: boolean,
+  onlyScraping: boolean;
+  withSpotdlScraping: boolean;
 };
 
 const initialSubclassFilter: SubclassFilter = {
@@ -16,6 +17,7 @@ const initialSubclassFilter: SubclassFilter = {
   subclasses: [],
   withComments: false,
   onlyScraping: false,
+  withSpotdlScraping: false,
 };
 
 export function formatDate(d: Date | null) {
@@ -63,6 +65,9 @@ export function SubclassFilterService() {
     },
     setOnlyScraping(newBool: boolean) {
       setSubclassFilter({...getSubclassFilter(), onlyScraping: newBool});
+    },
+    setWithSpotdlScraping(newBool: boolean) {
+      setSubclassFilter({...getSubclassFilter(), withSpotdlScraping: newBool});
     },
     setBegDate(newDate: Date) {
       setSubclassFilter({ ...getSubclassFilter(), begDate: newDate });

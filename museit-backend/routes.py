@@ -74,6 +74,7 @@ def scrape():
 #     "metadata_flag": true
 # }
 @app.route('/generate', methods=['POST'])
+@app.route('/generate', methods=['POST'])
 def scrape_with_metadata():
     data = request.json
     query = data.get('query')
@@ -89,24 +90,34 @@ def scrape_with_metadata():
         end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
     comments_flag = data.get('comments_flag')
     metadata_flag = data.get('metadata_flag')
+    spotdl_flag = data.get('spotdl_flag')
+    
     if not all([query, list_of_subreddits, start_date, end_date]):
         return jsonify({'error': 'Missing parameters'}), 400
-    print(query,list_of_subreddits,start_date,end_date, comments_flag, metadata_flag)
+    
+    print(query, list_of_subreddits, start_date, end_date, comments_flag, metadata_flag, spotdl_flag)
     posts = subreddits_posts_and_comments_given_query(query, list_of_subreddits, start_date, end_date, comments_flag)
-    import os
     path_to_save = f'plots/{query}'
-    if not os.path.exists(path_to_save):
-        os.makedirs(path_to_save)
+    os.makedirs(path_to_save, exist_ok=True)
     if metadata_flag:
         metadata = generate_metadata(posts)
-        metadata.to_csv(f'{path_to_save}/metadata.csv', index=False)
-        save_all_plots(f"{path_to_save}",metadata)
+        metadata.to_csv(os.path.join(path_to_save, "metadata.csv"), index=False)
+        save_all_plots(path_to_save, metadata)
     else:
         metadata = process_text_to_spotify_links(posts)
-        metadata.to_csv(f'{path_to_save}/metadata.csv', index=False)
+    
+    if spotdl_flag:
+        spotify_links = metadata['spotify_links'].tolist()
+        print(spotify_links)
+        if spotify_links != []:
+            process_spotify_links_with_spotdl(spotify_links, os.path.join(path_to_save, "spotdl_data"))
+        else:
+            print("No spotify links found!")
+    
     if metadata.empty:
         return metadata.to_dict()
     return metadata.to_dict()
+
 
 # @app.route('/plots/<query>', methods=['GET'])
 # def generate_plots(query):

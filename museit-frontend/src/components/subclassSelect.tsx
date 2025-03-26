@@ -108,7 +108,16 @@ export function SubclassSelect(props: {
           <div class="grid gap-1.5 leading-none">
             <Label for="terms1-input">Only scraping?</Label>
             <p class="text-xs">
-              Will skip modelling and analysis tasks and only give scraping results.
+              Ticking this will skip modelling and analysis tasks and only give scraping results.
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center space-x-2 mb-5">
+          <Checkbox checked={subclassFilterService().subclassFilter.withSpotdlScraping} onClick={() => {subclassFilterService().setWithSpotdlScraping(!subclassFilterService().subclassFilter.withSpotdlScraping)}}/>
+          <div class="grid gap-1.5 leading-none">
+            <Label for="terms1-input">Run spotDL Scraping?</Label>
+            <p class="text-xs">
+              Will generate .spotdl files for each spotify URI that was found (Only artists, albums and playlists). Files will be present in the backend executable directory.
             </p>
           </div>
         </div>

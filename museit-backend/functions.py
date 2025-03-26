@@ -1,12 +1,20 @@
 import datetime
 import shutil
 
+import os
+import re
+import subprocess
+import platform
+
 import praw
 import pandas as pd
 from spotipy import Spotify, SpotifyClientCredentials
 from tqdm import tqdm
 
 import yaml
+
+
+
 
 with open('secrets.yaml', 'r', encoding="utf-8") as file:
     secrets = yaml.safe_load(file)
@@ -322,3 +330,118 @@ def list_directory_two_levels(path):
                 if item == os.listdir(path)[-1]:
                     subitem_prefix = "    ├── " if subitem != os.listdir(item_path)[-1] else "    └── "
                 print(f"{subitem_prefix}{subitem}")
+
+
+
+# ------------- spotdl stuff
+
+# def convert_spotdl_to_csv(input_file):
+#     output_file = input_file.replace('.spotdl', '.csv')
+#     # Load the JSON data from the .spotdl file
+#     with open(input_file, 'r', encoding='utf-8') as f:
+#         data = json.load(f)
+
+#     # Determine the field names by using the union of keys from all JSON objects
+#     fieldnames = set()
+#     for entry in data:
+#         fieldnames.update(entry.keys())
+#     fieldnames = list(fieldnames)
+
+#     # Helper function to convert list values to a comma-separated string
+#     def convert_value(value):
+#         if isinstance(value, list):
+#             return ', '.join(str(item) for item in value)
+#         return value
+
+#     # Write the CSV file
+#     with open(output_file, 'w', newline='', encoding='utf-8') as csvfile:
+#         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+#         writer.writeheader()
+#         for entry in data:
+#             # Convert any list fields into a comma-separated string
+#             entry_converted = {key: convert_value(entry.get(key, "")) for key in fieldnames}
+#             writer.writerow(entry_converted)
+
+#     # Delete the original .spotdl file after conversion
+#     os.remove(input_file)
+
+
+# # input_file = 'spotify_metadata/playlists/2ZbkFdn7eSnTkd9E0ZeX2j.spotdl'  # Input file with .spotdl extension
+# # convert_spotdl_to_csv(input_file)
+
+def get_spotify_uri_and_type(url):
+    """
+    Parses a Spotify URL and returns a tuple (url_type, spotify_uri).
+    If the URL does not match one of the expected types, returns ("none", None).
+    """
+    pattern = re.compile(r"https://open\.spotify\.com/(album|track|playlist)/([a-zA-Z0-9]+)")
+    match = pattern.match(url)
+    
+    if match:
+        url_type, spotify_id = match.groups()
+        spotify_uri = f"{spotify_id}"
+        return url_type, spotify_uri
+    
+    return "none", None
+    
+
+def fetch_metadata(url, output_folder):
+    """
+    Fetches metadata for a Spotify URL using spotdl and saves it in the given folder.
+    """
+    url_type, spotify_uri = get_spotify_uri_and_type(url)
+    
+    if url_type not in ["track", "album", "playlist"]:
+        print("Invalid Spotify URL type.")
+        return
+    
+    metadata_dir = os.path.join(output_folder, url_type + "s")
+    os.makedirs(metadata_dir, exist_ok=True)
+    metadata_file = os.path.join(metadata_dir, f"{spotify_uri}.spotdl")
+
+    # Determine the spotdl executable path
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    spotdl_executable = os.path.join(script_dir, "spotdl")
+
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    system_name = platform.system()
+    
+    if system_name == "Windows":
+        spotdl_executable = os.path.join(script_dir, "spotdl_windows.exe")
+    elif system_name == "Linux":
+        spotdl_executable = os.path.join(script_dir, "spotdl_linux")
+    elif system_name == "Darwin":  # macOS
+        spotdl_executable = os.path.join(script_dir, "spotdl_mac")
+    else:
+        print("Unsupported operating system.")
+        return None
+
+    # if platform.system() == "Windows":
+    #     spotdl_executable += ".exe"
+
+    # if not os.path.exists(spotdl_executable):
+    #     print("Error: spotdl executable not found in the script directory.")
+    #     return
+
+    command = [spotdl_executable, "save", url, "--save-file", metadata_file]
+    try:
+        subprocess.run(command, capture_output=True, text=True, check=True)
+    except subprocess.CalledProcessError as e:
+        print("Error fetching metadata:", e.stderr)
+    
+def process_spotify_links_with_spotdl(spotify_links, output_folder="spotdl_data"):
+    """
+    Processes a list of Spotify links, generating .spotdl files in a specified folder.
+    """
+    os.makedirs(output_folder, exist_ok=True)
+    print("Generating .spotdl metadata for Spotify links...")
+    
+    for urllist in spotify_links:
+        for url in urllist:
+            fetch_metadata(url, output_folder)
+
+# # Example usage:
+# # artist_url = "https://open.spotify.com/artist/1wRPtKGflJrBx9BmLsSwlU"
+# # url = "https://open.spotify.com/track/1f5aofDt2CHxCELwP8STu9"
+# test_url = "https://open.spotify.com/playlist/2ZbkFdn7eSnTkd9E0ZeX2j?si=EabDFz8sRNC6eNVZSLiylQ"
+# fetch_metadata(test_url)
