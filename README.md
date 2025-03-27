@@ -23,6 +23,7 @@ This will open a console window in which the backend is running, as well as a br
   ```
   ./spotdl_<platform> --download-ffmpeg
   ```
+  For linux systems, you may have to explicitly give execute permissions to this file by running the command `chmod +x spotdl_linux` in the backend directory.
 
 ## How to develop
 

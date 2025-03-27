@@ -439,7 +439,7 @@ def process_spotify_links_with_spotdl(spotify_links, output_folder="spotdl_data"
     os.makedirs(output_folder, exist_ok=True)
     print("Generating .spotdl metadata for Spotify links...")
     
-    for urllist in tqdm(spotify_links):
+    for urllist in tqdm(spotify_links, desc="Processing Spotify links"):
         for url in urllist:
             fetch_metadata(url, output_folder)
 
