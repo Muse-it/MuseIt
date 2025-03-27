@@ -117,7 +117,7 @@ export function SubclassSelect(props: {
           <div class="grid gap-1.5 leading-none">
             <Label for="terms1-input">Run spotDL Scraping?</Label>
             <p class="text-xs">
-              Will generate .spotdl files for each spotify URI that was found (Only artists, albums and playlists). Files will be present in the backend executable directory.
+              Will generate spotdl data files for each spotify URI that was found (Only artists, albums and playlists). Files will be present in the backend executable directory.
             </p>
           </div>
         </div>

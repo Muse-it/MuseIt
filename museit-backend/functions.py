@@ -1,5 +1,7 @@
 import datetime
 import shutil
+import json
+import csv
 
 import os
 import re
@@ -335,35 +337,35 @@ def list_directory_two_levels(path):
 
 # ------------- spotdl stuff
 
-# def convert_spotdl_to_csv(input_file):
-#     output_file = input_file.replace('.spotdl', '.csv')
-#     # Load the JSON data from the .spotdl file
-#     with open(input_file, 'r', encoding='utf-8') as f:
-#         data = json.load(f)
+def convert_spotdl_to_csv(input_file):
+    output_file = input_file.replace('.spotdl', '.csv')
+    # Load the JSON data from the .spotdl file
+    with open(input_file, 'r', encoding='utf-8') as f:
+        data = json.load(f)
 
-#     # Determine the field names by using the union of keys from all JSON objects
-#     fieldnames = set()
-#     for entry in data:
-#         fieldnames.update(entry.keys())
-#     fieldnames = list(fieldnames)
+    # Determine the field names by using the union of keys from all JSON objects
+    fieldnames = set()
+    for entry in data:
+        fieldnames.update(entry.keys())
+    fieldnames = list(fieldnames)
 
-#     # Helper function to convert list values to a comma-separated string
-#     def convert_value(value):
-#         if isinstance(value, list):
-#             return ', '.join(str(item) for item in value)
-#         return value
+    # Helper function to convert list values to a comma-separated string
+    def convert_value(value):
+        if isinstance(value, list):
+            return ', '.join(str(item) for item in value)
+        return value
 
-#     # Write the CSV file
-#     with open(output_file, 'w', newline='', encoding='utf-8') as csvfile:
-#         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-#         writer.writeheader()
-#         for entry in data:
-#             # Convert any list fields into a comma-separated string
-#             entry_converted = {key: convert_value(entry.get(key, "")) for key in fieldnames}
-#             writer.writerow(entry_converted)
+    # Write the CSV file
+    with open(output_file, 'w', newline='', encoding='utf-8') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        for entry in data:
+            # Convert any list fields into a comma-separated string
+            entry_converted = {key: convert_value(entry.get(key, "")) for key in fieldnames}
+            writer.writerow(entry_converted)
 
-#     # Delete the original .spotdl file after conversion
-#     os.remove(input_file)
+    # Delete the original .spotdl file after conversion
+    os.remove(input_file)
 
 
 # # input_file = 'spotify_metadata/playlists/2ZbkFdn7eSnTkd9E0ZeX2j.spotdl'  # Input file with .spotdl extension
@@ -426,6 +428,7 @@ def fetch_metadata(url, output_folder):
     command = [spotdl_executable, "save", url, "--save-file", metadata_file]
     try:
         subprocess.run(command, capture_output=True, text=True, check=True)
+        convert_spotdl_to_csv(metadata_file)
     except subprocess.CalledProcessError as e:
         print("Error fetching metadata:", e.stderr)
     
@@ -436,7 +439,7 @@ def process_spotify_links_with_spotdl(spotify_links, output_folder="spotdl_data"
     os.makedirs(output_folder, exist_ok=True)
     print("Generating .spotdl metadata for Spotify links...")
     
-    for urllist in spotify_links:
+    for urllist in tqdm(spotify_links):
         for url in urllist:
             fetch_metadata(url, output_folder)
 
