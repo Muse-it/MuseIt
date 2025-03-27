@@ -172,6 +172,13 @@ def process_text_to_spotify_links(df, columns_to_merge=["title","body","url"]):
     df['spotify_links'] = df['all_links'].apply(lambda urls: [url for url in urls if 'spotify.com' in url])
     df.drop(["merged_text"],axis=1)
     #df=extract_spotify_data(df, 'spotify_links')
+    
+    pattern = re.compile(r"https://open\.spotify\.com/(album|track|playlist)/([a-zA-Z0-9]+)")
+    if 'comments' in df.columns:
+        df['comment_urls'] = df['comments'].apply(
+            lambda comments: [match.group(0) for comment in comments for match in pattern.finditer(comment)]
+        )
+
     return df
 
 ###########################################################################
