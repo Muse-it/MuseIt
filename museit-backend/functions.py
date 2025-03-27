@@ -387,7 +387,7 @@ def get_spotify_uri_and_type(url):
     return "none", None
     
 
-def fetch_metadata(url, output_folder):
+def fetch_metadata(url, output_folder, overwrite=False, timeout_minutes = 5):
     """
     Fetches metadata for a Spotify URL using spotdl and saves it in the given folder.
     """
@@ -399,6 +399,9 @@ def fetch_metadata(url, output_folder):
     
     metadata_dir = os.path.join(output_folder, url_type + "s")
     os.makedirs(metadata_dir, exist_ok=True)
+    if not overwrite and os.path.exists(os.path.join(metadata_dir, f"{spotify_uri}.csv")):
+        print(f"Metadata for {url} already exists. Skipping.")
+        return None
     metadata_file = os.path.join(metadata_dir, f"{spotify_uri}.spotdl")
 
     # Determine the spotdl executable path
@@ -427,8 +430,12 @@ def fetch_metadata(url, output_folder):
 
     command = [spotdl_executable, "save", url, "--save-file", metadata_file]
     try:
-        subprocess.run(command, capture_output=True, text=True, check=True)
+        subprocess.run(command, capture_output=True, text=True, check=True, timeout=timeout_minutes*60)
         convert_spotdl_to_csv(metadata_file)
+    except subprocess.TimeoutExpired:
+        print(f"Timeout expired for {url}. Process took more than {timeout_minutes} minutes.")
+        if os.path.exists(metadata_file):
+            os.remove(metadata_file)
     except subprocess.CalledProcessError as e:
         print("Error fetching metadata:", e.stderr)
     
