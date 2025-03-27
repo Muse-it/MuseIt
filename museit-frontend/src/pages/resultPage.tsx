@@ -128,7 +128,7 @@ export const GenerateSpinner = () => (
     </p>
     <p class="text-xs mt-3">
       If the required models are not cached then the backend should start a
-      download as well
+      download of those models as well (this should happen only once)
     </p>
   </div>
 );

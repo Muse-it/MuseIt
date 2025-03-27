@@ -32,7 +32,7 @@ const redditClient: APIClient = {
   },
   async makeGenerateQuery(subclassFilter: SubclassFilter, query: string) {
     if (subclassFilter.subclasses.length <= 0) {
-      throw new Error("No subclasses to search");
+      throw new Error("No subreddits to search");
     }
     var begDate = subclassFilter.begDate;
     var endDate = subclassFilter.endDate;

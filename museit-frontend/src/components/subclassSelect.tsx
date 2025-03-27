@@ -99,7 +99,7 @@ export function SubclassSelect(props: {
           <div class="grid gap-1.5 leading-none">
             <Label for="terms1-input">Include comments?</Label>
             <p class="text-xs">
-              Enable if comments are to be included in NLP analysis; <span class="text-error-foreground">Will cause the query to take much longer</span>
+              Enable if comments are to be included in NLP analysis; <span class="text-error-foreground">This might cause the query to take much longer</span>
             </p>
           </div>
         </div>
@@ -108,16 +108,16 @@ export function SubclassSelect(props: {
           <div class="grid gap-1.5 leading-none">
             <Label for="terms1-input">Only scraping?</Label>
             <p class="text-xs">
-              Ticking this will skip modelling and analysis tasks and only give scraping results.
+              Ticking this will skip modelling and analysis tasks and only give Reddit scraping results.
             </p>
           </div>
         </div>
         <div class="flex items-center space-x-2 mb-5">
           <Checkbox checked={subclassFilterService().subclassFilter.withSpotdlScraping} onClick={() => {subclassFilterService().setWithSpotdlScraping(!subclassFilterService().subclassFilter.withSpotdlScraping)}}/>
           <div class="grid gap-1.5 leading-none">
-            <Label for="terms1-input">Run spotDL Scraping?</Label>
+            <Label for="terms1-input">Extract tracks metadata?</Label>
             <p class="text-xs">
-              Will generate spotdl data files for each spotify URI that was found (Only artists, albums and playlists). Files will be present in the backend executable directory.
+              Will generate csv data files for each spotify URL that was found (only tracks, albums, and playlists). Files will be present in the backend executable directory in a folder called 'spotdl_data'.
             </p>
           </div>
         </div>
@@ -131,7 +131,7 @@ export function SubclassSelect(props: {
             <br />
             <div class="flex">
               <div class="flex-grow">
-                <h2 class="text-xl font-bold">Subclasses:</h2>
+                <h2 class="text-xl font-bold">Subreddits:</h2>
                 <div class="text-muted-foreground font-light text-xs">
                   Click the number to toggle
                 </div>
