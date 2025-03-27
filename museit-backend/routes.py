@@ -107,7 +107,7 @@ def scrape_with_metadata():
         metadata = process_text_to_spotify_links(posts)
     
     if spotdl_flag:
-        spotify_links = metadata['spotify_links'].tolist()
+        spotify_links = list(set(metadata['spotify_links'].tolist()))
         print(spotify_links)
         if spotify_links != []:
             process_spotify_links_with_spotdl(spotify_links, os.path.join(path_to_save, "spotdl_data"))
