@@ -53,6 +53,7 @@ const redditClient: APIClient = {
         comments_flag: subclassFilter.withComments,
         metadata_flag: !subclassFilter.onlyScraping,
         spotdl_flag: subclassFilter.withSpotdlScraping,
+        spotdl_comments_flag: subclassFilter.commentsInSpotdl,
       }),
       headers: {
         "Content-type": "application/json; charset=UTF-8",

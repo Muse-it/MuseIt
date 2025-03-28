@@ -2,3 +2,4 @@ spotify_client_id: "<id here>"
 spotify_client_secret: "<secret here>"
 reddit_client_id: "<id here>"
 reddit_client_secret: "<secret here>"
+metadata_extraction_timeout_minutes: 5

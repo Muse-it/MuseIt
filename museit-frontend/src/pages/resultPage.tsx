@@ -68,7 +68,7 @@ export default function ResultPage() {
   return (
     <div class="max-w-full">
       <TitleElement />
-      <div style={{ display: "grid", "grid-template-columns": "1fr 5fr" }}>
+      <div style={{ display: "grid", "grid-template-columns": "2fr 5fr" }}>
         {/* Subclass Filter */}
         <Switch>
           <Match when={searchQuery.isPending}>

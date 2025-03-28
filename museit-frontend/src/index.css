@@ -105,7 +105,7 @@
 }
 
 @layer components {
-  @keyframes flashButtonAnim {
+  @keyframes flashAnim {
     0% {
       box-shadow: none;
     }
@@ -116,8 +116,8 @@
       box-shadow: none;
     }
   }
-  .flashButton {
-    animation: flashButtonAnim 2s ease-in-out forwards;
+  .flash {
+    animation: flashAnim 2s ease-in-out forwards;
   }
 }
 

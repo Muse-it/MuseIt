@@ -31,7 +31,7 @@ pyinstaller -y routes.spec
 ```
 > The `-y` switch will automatically delete and replace the previous build. Can add `-F` for a one file build but will cause the launch of the executable to be slower.
 
-This command will generate an executable in `./dist`. Bundle it with an empty `secrets.yaml` that is to be filled by the user. Also ensure the presence of the `praw.ini` file.
+This command will generate an executable in `./dist`. Bundle it with an empty `config.yaml` that is to be filled by the user. Also ensure the presence of the `praw.ini` file.
 
 Final tree should look something like:
 
@@ -43,7 +43,7 @@ dist/routes/
 │  ├─ index.html
 │  ├─ other files...
 ├─ praw.ini
-├─ secrets.yaml (Make sure this doesn't have your secrets!)
+├─ config.yaml (Make sure this doesn't have your secrets!)
 ``` -->
 
 ```
@@ -51,7 +51,7 @@ dist/routes/
 ├─ routes.exe
 ├─ _internal/
 ├─ praw.ini
-├─ secrets.yaml (Make sure this doesn't have your secrets!)
+├─ config.yaml (Make sure this doesn't have your secrets!)
 ``` 
 
 ## Things to note

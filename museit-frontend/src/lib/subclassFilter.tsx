@@ -9,6 +9,8 @@ export type SubclassFilter = {
   withComments: boolean;
   onlyScraping: boolean;
   withSpotdlScraping: boolean;
+  // Don't use this directly! Use derivedCommentsInSpotdl instead (LATER: make it private, if possible?)
+  commentsInSpotdl: boolean;
 };
 
 const initialSubclassFilter: SubclassFilter = {
@@ -18,6 +20,7 @@ const initialSubclassFilter: SubclassFilter = {
   withComments: false,
   onlyScraping: false,
   withSpotdlScraping: false,
+  commentsInSpotdl: false,
 };
 
 export function formatDate(d: Date | null) {
@@ -35,6 +38,11 @@ export function SubclassFilterService() {
   return {
     get subclassFilter() {
       return getSubclassFilter();
+    },
+
+    get derivedCommentsInSpotdl() {
+      const sf = getSubclassFilter();
+      return (sf.withComments && sf.withSpotdlScraping) ? sf.commentsInSpotdl : false;
     },
 
     toggleSubclass(subc: string) {
@@ -68,6 +76,9 @@ export function SubclassFilterService() {
     },
     setWithSpotdlScraping(newBool: boolean) {
       setSubclassFilter({...getSubclassFilter(), withSpotdlScraping: newBool});
+    },
+    setCommentsInSpotdl(newBool: boolean) {
+      setSubclassFilter({...getSubclassFilter(), commentsInSpotdl: newBool});
     },
     setBegDate(newDate: Date) {
       setSubclassFilter({ ...getSubclassFilter(), begDate: newDate });

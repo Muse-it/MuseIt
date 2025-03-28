@@ -1,4 +1,4 @@
-secrets.yaml
+config.yaml
 build/
 dist/
 plots/

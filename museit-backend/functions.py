@@ -1,4 +1,3 @@
-import datetime
 import shutil
 import json
 import csv
@@ -16,15 +15,31 @@ from tqdm import tqdm
 import yaml
 
 
+from bertopic import BERTopic
+from flair.embeddings import TransformerDocumentEmbeddings
+from scipy.cluster import hierarchy as sch
+import datetime
+import tweetnlp
+from urlextract import URLExtract
+import plotly.express as px
+import plotly.graph_objs as go
+from wordcloud import WordCloud, STOPWORDS
+import matplotlib.pyplot as plt
+import os
+import zipfile
+import os
 
 
-with open('secrets.yaml', 'r', encoding="utf-8") as file:
-    secrets = yaml.safe_load(file)
 
-spotify_client_id = secrets['spotify_client_id']
-spotify_client_secret = secrets['spotify_client_secret']
-reddit_client_id = secrets['reddit_client_id']
-reddit_client_secret = secrets['reddit_client_secret']
+
+with open('config.yaml', 'r', encoding="utf-8") as file:
+    config = yaml.safe_load(file)
+
+spotify_client_id = config['spotify_client_id']
+spotify_client_secret = config['spotify_client_secret']
+reddit_client_id = config['reddit_client_id']
+reddit_client_secret = config['reddit_client_secret']
+metadata_extraction_timeout_minutes = config['metadata_extraction_timeout_minutes']
 
 spotify = Spotify(client_credentials_manager=SpotifyClientCredentials(client_id=spotify_client_id, client_secret=spotify_client_secret))
 reddit = praw.Reddit(client_id=reddit_client_id, client_secret=reddit_client_secret, user_agent="datacollection",check_for_async=False)   
@@ -82,7 +97,6 @@ def subreddits_posts_and_comments_given_query(query, list_of_subreddits, start_d
 ########################### tweetnlp and models ###########################
 ###########################################################################
 def generate_metadata(df):
-    import tweetnlp
     print("Processing Metadata from TweetNLP")
     sentiment_model = tweetnlp.load_model('sentiment')
     emotion_model = tweetnlp.load_model('emotion')
@@ -115,7 +129,6 @@ def generate_metadata(df):
 ###########################################################################
 ####################### links processing and spotipy ######################
 ###########################################################################
-from urlextract import URLExtract
 
 def extract_spotify_data(df, url_column):
     print("Extracting Spotify Data")
@@ -184,8 +197,6 @@ def process_text_to_spotify_links(df, columns_to_merge=["title","body","url"]):
 ###########################################################################
 ############################ plotting functions ###########################
 ###########################################################################
-import plotly.express as px
-import plotly.graph_objs as go
 def plot_category_percentage(df, column_name):
     category_count = df[column_name].value_counts()
     category_percentage = (category_count / df.shape[0]) * 100
@@ -244,8 +255,6 @@ def plot_time_series(df, date_column, category_column, freq='M'):
     )
     return fig
 
-from wordcloud import WordCloud, STOPWORDS
-import matplotlib.pyplot as plt
 def generate_wordcloud(column):
     text = ' '.join(column)
     stopwords = set(STOPWORDS)
@@ -257,8 +266,6 @@ def generate_wordcloud(column):
     return plt
 
 def save_all_plots(folder_name,df):
-    import os
-    import zipfile
     if not os.path.exists(folder_name):
         os.makedirs(folder_name)
     fig=generate_wordcloud(df["title"])
@@ -266,9 +273,6 @@ def save_all_plots(folder_name,df):
     listx=["topics","sentiment","emotion"]
     listy=["D","W","M"]
     #hierarchial
-    from bertopic import BERTopic
-    from flair.embeddings import TransformerDocumentEmbeddings
-    from scipy.cluster import hierarchy as sch
     try:
         print("Generating hierarchical topics...")
         roberta = TransformerDocumentEmbeddings('roberta-base')
@@ -341,7 +345,6 @@ def save_all_plots(folder_name,df):
 #             plot_time_series(df, 'created_utc', i, freq=j).write_html(temporal_filename)
             
 def list_directory_two_levels(path):
-    import os
     # Check if the path exists
     if not os.path.exists(path):
         print(f"Path {path} does not exist")
@@ -418,7 +421,7 @@ def get_spotify_uri_and_type(url):
     return "none", None
     
 
-def fetch_metadata(url, output_folder, overwrite=False, timeout_minutes = 5):
+def fetch_metadata(url, output_folder, overwrite=False, timeout_minutes = metadata_extraction_timeout_minutes):
     """
     Fetches metadata for a Spotify URL using spotdl and saves it in the given folder.
     """

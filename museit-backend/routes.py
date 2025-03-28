@@ -74,7 +74,6 @@ def scrape():
 #     "metadata_flag": true
 # }
 @app.route('/generate', methods=['POST'])
-@app.route('/generate', methods=['POST'])
 def scrape_with_metadata():
     data = request.json
     query = data.get('query')
@@ -91,6 +90,7 @@ def scrape_with_metadata():
     comments_flag = data.get('comments_flag')
     metadata_flag = data.get('metadata_flag')
     spotdl_flag = data.get('spotdl_flag')
+    spotdl_comments_flag = data.get('spotdl_comments_flag')
     
     if not all([query, list_of_subreddits, start_date, end_date]):
         return jsonify({'error': 'Missing parameters'}), 400
@@ -108,6 +108,9 @@ def scrape_with_metadata():
     
     if spotdl_flag:
         spotify_links = metadata['spotify_links'].tolist()
+        if spotdl_comments_flag:
+            spotify_comment_links = metadata['comment_urls'].tolist()
+            spotify_links.extend(spotify_comment_links)
         print(spotify_links)
         if spotify_links != []:
             process_spotify_links_with_spotdl(spotify_links, os.path.join(path_to_save, "spotdl_data"))

@@ -10,12 +10,14 @@ import { Button } from "./ui/button";
 import { TbSelectAll } from "solid-icons/tb";
 import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/lablel";
+import { createSignal } from "solid-js";
 
 export function SubclassSelect(props: {
   allSubclasses: Subclass[];
   triggerRefetch: () => void;
 }) {
   const subclassFilterService = useService(SubclassFilterService);
+  const [flashCheckboxBool, setFlashCheckboxBool] = createSignal(false);
   // const [startDate, setStartDate] = createSignal(
   //   new Date(Date.now()).toISOString()
   // );
@@ -33,6 +35,20 @@ export function SubclassSelect(props: {
       return;
     }
     props.triggerRefetch();
+  }
+
+  function canIncludeCommentsInSpotdl() {
+    return subclassFilterService().subclassFilter.withComments && subclassFilterService().subclassFilter.withSpotdlScraping;
+  }
+
+  function flashCheckboxes() {
+    if(canIncludeCommentsInSpotdl()) {
+      return;
+    }
+    setFlashCheckboxBool(true);
+    setTimeout(() => {
+      setFlashCheckboxBool(false);
+    }, 2000);
   }
 
   return (
@@ -94,30 +110,55 @@ export function SubclassSelect(props: {
         {/* 
           Checkboxes
         */}
-        <div class="flex items-center space-x-2 mb-5">
-          <Checkbox checked={subclassFilterService().subclassFilter.withComments} onClick={() => {subclassFilterService().setWithComments(!subclassFilterService().subclassFilter.withComments)}}/>
-          <div class="grid gap-1.5 leading-none">
-            <Label for="terms1-input">Include comments?</Label>
-            <p class="text-xs">
-              Enable if comments are to be included in NLP analysis; <span class="text-error-foreground">This might cause the query to take much longer</span>
-            </p>
-          </div>
-        </div>
-        <div class="flex items-center space-x-2 mb-5">
-          <Checkbox checked={subclassFilterService().subclassFilter.onlyScraping} onClick={() => {subclassFilterService().setOnlyScraping(!subclassFilterService().subclassFilter.onlyScraping)}}/>
-          <div class="grid gap-1.5 leading-none">
-            <Label for="terms1-input">Only scraping?</Label>
+        <div class="ml-2 flex items-center mb-5">
+          <Checkbox
+            class="space-x-0"
+            checked={subclassFilterService().subclassFilter.onlyScraping}
+            onClick={() => {subclassFilterService().setOnlyScraping(!subclassFilterService().subclassFilter.onlyScraping)}}
+          />
+          <div class="ml-2 grid gap-1.5 leading-none">
+            <Label>Only scraping?</Label>
             <p class="text-xs">
               Ticking this will skip modelling and analysis tasks and only give Reddit scraping results.
             </p>
           </div>
         </div>
-        <div class="flex items-center space-x-2 mb-5">
-          <Checkbox checked={subclassFilterService().subclassFilter.withSpotdlScraping} onClick={() => {subclassFilterService().setWithSpotdlScraping(!subclassFilterService().subclassFilter.withSpotdlScraping)}}/>
-          <div class="grid gap-1.5 leading-none">
-            <Label for="terms1-input">Extract tracks metadata?</Label>
+        <div class="ml-2 flex items-center mb-5">
+          <Checkbox
+            checked={subclassFilterService().subclassFilter.withComments}
+            onClick={() => {subclassFilterService().setWithComments(!subclassFilterService().subclassFilter.withComments)}}
+            class={`${flashCheckboxBool() ? "flash" : ""} space-x-0`}
+          />
+          <div class="ml-2 grid gap-1.5 leading-none">
+            <Label>Include comments?</Label>
+            <p class="text-xs">
+              Enable if comments are to be included in NLP analysis; <span class="text-error-foreground">This might cause the query to take much longer</span>
+            </p>
+          </div>
+        </div>
+        <div class="ml-2 flex items-center mb-5">
+          <Checkbox 
+            checked={subclassFilterService().subclassFilter.withSpotdlScraping} 
+            onClick={() => {subclassFilterService().setWithSpotdlScraping(!subclassFilterService().subclassFilter.withSpotdlScraping)}}
+            class={`${flashCheckboxBool() ? "flash" : ""} space-x-0`}
+          />
+          <div class="ml-2 grid gap-1.5 leading-none">
+            <Label>Extract tracks metadata?</Label>
             <p class="text-xs">
               Will generate csv data files for each spotify URL that was found (only tracks, albums, and playlists). Files will be present in the backend executable directory in a folder called 'spotdl_data'.
+            </p>
+          </div>
+        </div>
+        <div class="ml-2 flex items-center mb-5" onClick={() => {flashCheckboxes()}}>
+          <Checkbox
+            class={`${!canIncludeCommentsInSpotdl() ? "cursor-not-allowed opacity-50" : ""} space-x-0`}
+            checked={subclassFilterService().derivedCommentsInSpotdl}
+            onClick={() => {subclassFilterService().setCommentsInSpotdl(!subclassFilterService().subclassFilter.commentsInSpotdl)}}
+          />
+          <div class="ml-2 grid gap-1.5 leading-none">
+            <Label>Include comment URLs in metadata extraction?</Label>
+            <p class="text-xs">
+              Only available when comments are included and metadata extraciton is occurring.
             </p>
           </div>
         </div>
