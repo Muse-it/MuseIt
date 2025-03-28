@@ -67,7 +67,7 @@ export default function SearchForm(props: { searchSignal: Signal<string> }) {
             </TextField>
           </div>
           <SearchButton source={"reddit"} onClick={() => doSearch("reddit")} />
-          <SearchButton source={"mock"} onClick={() => doSearch("mock")} />
+          {/* <SearchButton source={"mock"} onClick={() => doSearch("mock")} /> */}
         </form>
       </div>
     </div>

@@ -201,6 +201,29 @@ def plot_category_percentage(df, column_name):
         color=category_percentage.index,  # This assigns a unique color based on the category
         color_discrete_sequence=colors    # This uses the list of colors defined above
     )
+    fig.update_layout(
+        font=dict(
+            size=24  # Increase font size by a large amount
+        ),
+        title_font=dict(
+            size=32  # Increase title font size by a large amount
+        ),
+        legend=dict(
+            font=dict(
+                size=20  # Increase legend font size by a large amount
+            )
+        ),
+        xaxis=dict(
+            tickfont=dict(
+                size=20  # Increase x-axis tick font size
+            )
+        ),
+        yaxis=dict(
+            tickfont=dict(
+                size=20  # Increase y-axis tick font size
+            )
+        )
+    )
     return fig
 def plot_histogram(df, column_name, title='Top 10 Histogram'):
     value_counts = df[column_name].value_counts().reset_index()
@@ -220,6 +243,7 @@ def plot_time_series(df, date_column, category_column, freq='M'):
         labels={'counts': 'Number of occurrences'}
     )
     return fig
+
 from wordcloud import WordCloud, STOPWORDS
 import matplotlib.pyplot as plt
 def generate_wordcloud(column):
