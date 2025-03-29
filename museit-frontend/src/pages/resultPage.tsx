@@ -89,6 +89,7 @@ export default function ResultPage() {
 
         {/* Generated Data */}
         <Switch>
+          {/* //TODO: This continues to spin even when queries have failed */}
           <Match when={genQuery.isFetching}>
             <GenerateSpinner />
           </Match>

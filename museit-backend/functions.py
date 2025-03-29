@@ -9,7 +9,7 @@ import platform
 
 import praw
 import pandas as pd
-from spotipy import Spotify, SpotifyClientCredentials
+# from spotipy import Spotify, SpotifyClientCredentials
 from tqdm import tqdm
 
 import yaml
@@ -35,13 +35,13 @@ import os
 with open('config.yaml', 'r', encoding="utf-8") as file:
     config = yaml.safe_load(file)
 
-spotify_client_id = config['spotify_client_id']
-spotify_client_secret = config['spotify_client_secret']
+# spotify_client_id = config['spotify_client_id']
+# spotify_client_secret = config['spotify_client_secret']
 reddit_client_id = config['reddit_client_id']
 reddit_client_secret = config['reddit_client_secret']
 metadata_extraction_timeout_minutes = config['metadata_extraction_timeout_minutes']
 
-spotify = Spotify(client_credentials_manager=SpotifyClientCredentials(client_id=spotify_client_id, client_secret=spotify_client_secret))
+# spotify = Spotify(client_credentials_manager=SpotifyClientCredentials(client_id=spotify_client_id, client_secret=spotify_client_secret))
 reddit = praw.Reddit(client_id=reddit_client_id, client_secret=reddit_client_secret, user_agent="datacollection",check_for_async=False)   
 
 ###########################################################################
@@ -130,46 +130,44 @@ def generate_metadata(df):
 ####################### links processing and spotipy ######################
 ###########################################################################
 
-def extract_spotify_data(df, url_column):
-    print("Extracting Spotify Data")
-    df['ArtistNames'] = [[] for _ in range(len(df))]
-    df['TrackNames'] = [[] for _ in range(len(df))]
-    df['SpotifyURIs'] = [[] for _ in range(len(df))]
-    df['AudioFeatures'] = [[] for _ in range(len(df))]
-    for index, row in tqdm(df.iterrows(), total=df.shape[0]):
-        url_list = row[url_column]
-        for url in url_list:
-            parts = url.split("/")
-            if len(parts) < 2:
-                continue
-            spotify_type = parts[-2]
-            spotify_id = parts[-1].split("?")[0]
+# def extract_spotify_data(df, url_column):
+#     print("Extracting Spotify Data")
+#     df['ArtistNames'] = [[] for _ in range(len(df))]
+#     df['TrackNames'] = [[] for _ in range(len(df))]
+#     df['SpotifyURIs'] = [[] for _ in range(len(df))]
+#     df['AudioFeatures'] = [[] for _ in range(len(df))]
+#     for index, row in tqdm(df.iterrows(), total=df.shape[0]):
+#         url_list = row[url_column]
+#         for url in url_list:
+#             parts = url.split("/")
+#             if len(parts) < 2:
+#                 continue
+#             spotify_type = parts[-2]
+#             spotify_id = parts[-1].split("?")[0]
+#             try:
+#                 if spotify_type == 'track':
+#                     track_info = spotify.track(spotify_id)
+#                     df.at[index, 'ArtistNames'].append(track_info['artists'][0]['name'])
+#                     df.at[index, 'TrackNames'].append(track_info['name'])
+#                     df.at[index, 'SpotifyURIs'].append(track_info['uri'])
+#                 elif spotify_type in ['playlist', 'album']:
+#                     if spotify_type == 'playlist':
+#                         playlist_info = spotify.playlist(spotify_id)
+#                         tracks = playlist_info['tracks']['items']
+#                     else:
+#                         album_info = spotify.album(spotify_id)
+#                         tracks = album_info['tracks']['items']
+#                     for item in tracks:
+#                         track = item['track'] if spotify_type == 'playlist' else item
+#                         if track:
+#                             df.at[index, 'ArtistNames'].append(track['artists'][0]['name'])
+#                             df.at[index, 'TrackNames'].append(track['name'])
+#                             df.at[index, 'SpotifyURIs'].append(track['uri'])
+#             except Exception as e:
+#                 print(f"Error processing Spotify URL: {url}. Error: {e}")
+#     return df
 
-            try:
-                if spotify_type == 'track':
-                    track_info = spotify.track(spotify_id)
-                    df.at[index, 'ArtistNames'].append(track_info['artists'][0]['name'])
-                    df.at[index, 'TrackNames'].append(track_info['name'])
-                    df.at[index, 'SpotifyURIs'].append(track_info['uri'])
 
-                elif spotify_type in ['playlist', 'album']:
-                    if spotify_type == 'playlist':
-                        playlist_info = spotify.playlist(spotify_id)
-                        tracks = playlist_info['tracks']['items']
-                    else:
-                        album_info = spotify.album(spotify_id)
-                        tracks = album_info['tracks']['items']
-
-                    for item in tracks:
-                        track = item['track'] if spotify_type == 'playlist' else item
-                        if track:
-                            df.at[index, 'ArtistNames'].append(track['artists'][0]['name'])
-                            df.at[index, 'TrackNames'].append(track['name'])
-                            df.at[index, 'SpotifyURIs'].append(track['uri'])
-            except Exception as e:
-                print(f"Error processing Spotify URL: {url}. Error: {e}")
-
-    return df
 def process_text_to_spotify_links(df, columns_to_merge=["title","body","url"]):
     print("Processing Spotify Links from Text")
     if not all(col in df.columns for col in columns_to_merge):
