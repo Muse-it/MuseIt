@@ -7,6 +7,7 @@ app = Flask(__name__, static_folder='./static', static_url_path="", template_fol
 cors = CORS(app, resources={r"/*": {"origins": "*"}}) # Might pose a security risk but unsure whether it is so when only running on localhost
 import warnings
 import os
+import time
 warnings.filterwarnings("ignore")
 
 
@@ -19,6 +20,11 @@ def index():
 def serve(path):
     if path != "" and os.path.exists("/static/" + path):
         return send_from_directory('static', path)
+    
+# @app.route("/test", methods=["POST"])
+# def test_route(query):
+#     time.sleep(2)
+#     return {'a': 'b'}, 201
         
 
 #localhost:5000/query/"depression music"

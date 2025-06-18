@@ -71,13 +71,13 @@ export default function ResultPage() {
       <div style={{ display: "grid", "grid-template-columns": "2fr 5fr" }}>
         {/* Subclass Filter */}
         <Switch>
-          <Match when={searchQuery.isPending}>
-            <LoadingSpinner />
-          </Match>
           <Match when={searchQuery.isError}>
             <ErrorCard
               errorText={`Could not make search query: ${searchQuery.error.message}`}
             />
+          </Match>
+          <Match when={searchQuery.isPending}>
+            <LoadingSpinner />
           </Match>
           <Match when={searchQuery.isSuccess}>
             <SubclassSelect
@@ -89,8 +89,12 @@ export default function ResultPage() {
 
         {/* Generated Data */}
         <Switch>
-          {/* //TODO: This continues to spin even when queries have failed */}
-          <Match when={genQuery.isFetching}>
+          <Match when={genQuery.isError}>
+            <ErrorCard
+              errorText={`Could not make generate query: ${genQuery.error.message}`}
+            />
+          </Match>
+          <Match when={genQuery.isFetching  && !genQuery.isError}>
             <GenerateSpinner />
           </Match>
           <Match when={genQuery.isPending}>
@@ -98,11 +102,6 @@ export default function ResultPage() {
               <div class="text-3xl">Submit a filter to start generating.</div>
               <div class="text-xl">Note: If a search yields low number of results, then hierarchical_topics and topic_visualization plots won't be available.</div>
             </div>
-          </Match>
-          <Match when={genQuery.isError}>
-            <ErrorCard
-              errorText={`Could not make search query: ${searchQuery.error.message}`}
-            />
           </Match>
           <Match when={genQuery.isSuccess}>
             <div>
@@ -128,8 +127,8 @@ export const GenerateSpinner = () => (
       This may take a while. Open the backend console to monitor query progress.
     </p>
     <p class="text-xs mt-3">
-      If the required models are not cached then the backend should start a
-      download of those models as well (this should happen only once)
+      If the required models are not cached then the backend will start a
+      download of those models as well (this will take longer should happen only once per machine)
     </p>
   </div>
 );

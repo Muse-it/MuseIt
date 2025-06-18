@@ -64,32 +64,51 @@ def get_comments_for_submission(submission):
         comments.append(comment.body)
     return comments
 
-def subreddits_posts_and_comments_given_query(query, list_of_subreddits, start_date, end_date,comments_flag=False):
+def subreddits_posts_and_comments_given_query(query, list_of_subreddits, start_date, end_date, comments_flag=False):
     # Return the data as a DataFrame
-
     print("Reddit API called from Function subreddits_posts_and_comments_given_query")
     posts = pd.DataFrame()
+    
     for sub_idx, subreddit in enumerate(list_of_subreddits):
-        print(f"querying subreddit {sub_idx+1}/{len(list_of_subreddits)}")
-        for submission in tqdm(reddit.subreddit(subreddit).search(query, limit=None)):
-            created_utc = datetime.datetime.fromtimestamp(submission.created_utc)
-            if start_date <= created_utc.date() <= end_date:
-                #comments = get_comments_for_submission(submission)
-                #comments=[]
-                if comments_flag:
-                    comments = get_comments_for_submission(submission)
-                else:
-                    comments=[]
-                posts = posts.append({
-                    'subreddit': subreddit,
-                    'title': submission.title,
-                    'body': submission.selftext,
-                    'url': submission.url,
-                    'created_utc': created_utc,
-                    'num_comments': submission.num_comments,
-                    'comments': comments,
-                    'reddit_permalink': f"https://reddit.com{submission.permalink}"
-                }, ignore_index=True)
+        print(f"### querying subreddit ({sub_idx+1}/{len(list_of_subreddits)}): r/{subreddit}")
+        try:
+            for submission in tqdm(reddit.subreddit(subreddit).search(query, limit=None)):
+                try:
+                    created_utc = datetime.datetime.fromtimestamp(submission.created_utc)
+                    if start_date <= created_utc.date() <= end_date:
+                        if comments_flag:
+                            try:
+                                comments = get_comments_for_submission(submission)
+                            except Exception as e:
+                                print(f"Error getting comments for submission {submission.id}: {str(e)}")
+                                comments = []
+                        else:
+                            comments = []
+                            
+                        posts = posts.append({
+                            'subreddit': subreddit,
+                            'title': submission.title,
+                            'body': submission.selftext,
+                            'url': submission.url,
+                            'created_utc': created_utc,
+                            'num_comments': submission.num_comments,
+                            'comments': comments,
+                            'reddit_permalink': f"https://reddit.com{submission.permalink}"
+                        }, ignore_index=True)
+                except Exception as e:
+                    print(f"Error processing submission in r/{subreddit}: {str(e)}")
+                    continue
+                    
+        except Exception as e:
+            print(f"Rate limit or error encountered for r/{subreddit}: {str(e)}")
+            print(f"Saving partial results with {len(posts)} posts collected so far...")
+            continue
+
+    if len(posts) == 0:
+        print("Warning: No posts were collected")
+    else:
+        print(f"Successfully collected {len(posts)} posts in total")
+    
     return posts
 
 
