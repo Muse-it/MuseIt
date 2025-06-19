@@ -72,3 +72,73 @@ for-dist/
 ├─ config.yaml  (Make sure this doesn't have your API secrets!)
 ```
 
+### Manual Testing Guide
+
+#### Setting up the test environment
+
+Start the backend server in development mode:
+```bash
+cd museit-backend
+conda activate museit
+python routes.py	
+```
+
+Launch the frontend development server:
+
+```
+cd museit-frontend
+pnpm run dev
+```
+
+#### Test Cases
+
+- Initial Setup Test
+
+  1. Open browser to `http://localhost:3000`
+
+  2. Verify the frontend loads with navigation working
+
+  3. Check the About page loads with diagram visible
+
+* Model Download Test
+
+  1. Make your first request to `/generate` endpoint
+  2. Verify backend console shows model downloading progress
+  3. Confirm subsequent requests use cached models
+
+* Reddit Integration Test
+
+  1. Configure Reddit API credentials in `config.yaml`
+  2. Submit a search with few subreddit selections
+  3. Test with increasing number of subreddits to verify rate limit handling
+
+* Metadata Extraction Test
+
+  1. Test with a Spotify playlist URL
+
+  2. Verify ffmpeg is installed using:
+
+     ./spotdl_<platform> --download-ffmpeg
+
+  3. Monitor the backend console for extraction progress
+
+  4. Verify timeout works as configured in `config.yaml`
+
+* Route Conflict Test
+
+  1. Verify frontend routes in [src/routes.ts](vscode-file://vscode-app/c:/SSDUtilities/Microsoft VS Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html)
+  2. Verify backend routes in Flask app
+  3. Ensure no duplicate routes exist between frontend and backend
+  4. Test all main navigation paths
+
+* Data Visualization Test
+
+  1. Generate plots through the interface
+  2. Verify plotly download button appears in top-right
+  3. Test image saving via right-click
+  4. Verify saved files are complete and readable
+
+* Backend Testing:
+
+  1. The two main routes -- `/generate` and `/query`, can be tested with backend testing applications like [Postman](https://www.postman.com/)
+
