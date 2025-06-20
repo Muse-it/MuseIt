@@ -6,9 +6,9 @@ import { Router } from "@solidjs/router";
 import App from "./app";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
 import { ServiceRegistry } from "solid-services";
+import { JSX } from "solid-js";
 
 const root = document.getElementById("root");
-const client = new QueryClient();
 
 if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
   throw new Error(
@@ -16,15 +16,16 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
   );
 }
 
-render(
-  () => (
-    <QueryClientProvider client={client}>
+export function renderWithProviders(component: () => JSX.Element) {
+  const queryClient = new QueryClient();
+
+  return (
+    <QueryClientProvider client={queryClient}>
       <ServiceRegistry>
-        <Router>
-          <App />
-        </Router>
+        <Router>{component()}</Router>
       </ServiceRegistry>
     </QueryClientProvider>
-  ),
-  root
-);
+  );
+}
+
+render(() => renderWithProviders(() => <App />), root);

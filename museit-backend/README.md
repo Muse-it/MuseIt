@@ -22,38 +22,6 @@ Flask server backend that contains AI things used by MuseIt. Also serves the fro
 
    (If any import errors come up, install the required dependencies with `conda install <dep>`)
 
-## How to build for distribution
-Before building, ensure `debug=False` in the `app.run` call in `routes.py`. You may enable this flag during development but is recommended `False` for production build.
-Ensure that the build files from the frontend are in the same directory (copy contents of `frontenc/dist` to `./static`). The following command needs to be run on each platform that the distribution will run on (Win/Mac/Linux):
-
-```
-pyinstaller -y routes.spec
-```
-> The `-y` switch will automatically delete and replace the previous build. Can add `-F` for a one file build but will cause the launch of the executable to be slower.
-
-This command will generate an executable in `./dist`. Bundle it with an empty `config.yaml` that is to be filled by the user. Also ensure the presence of the `praw.ini` file.
-
-Final tree should look something like:
-
-<!-- ```
-dist/routes/
-├─ routes.exe
-├─ _internal/
-├─ static/
-│  ├─ index.html
-│  ├─ other files...
-├─ praw.ini
-├─ config.yaml (Make sure this doesn't have your secrets!)
-``` -->
-
-```
-dist/routes/
-├─ routes.exe
-├─ _internal/
-├─ praw.ini
-├─ config.yaml (Make sure this doesn't have your secrets!)
-``` 
-
 ## Things to note
 
 ##### IMPORTANT: Ensure no routes are the same between the frontend and the backend.
