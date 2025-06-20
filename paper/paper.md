@@ -2,10 +2,12 @@
 title: "Muse-it: A Tool for Analyzing Music Discourse on Reddit"
 tags:
   - Python
-  - TypeScript
-  - music information retrieval
-  - social media
-  - data analysis
+  - Reddit
+  - Music Information Retrieval
+  - Musicology
+  - Social Media
+  - Data Analysis
+  - NLP
 authors:
   - name: Jatin Agarwala
     corresponding: true
@@ -36,7 +38,7 @@ Muse-it is an open-source platform for retrieving, processing, and visualizing l
 
 Reddit is a social media platform built around user-created communities called subreddits, where users can interact anonymously. While other platforms impose character limits or induce social desirability bias, Reddit’s anonymity encourages users to share experiences freely and openly. Users often post links to personal music choices, including playlists, providing an organic source of data on musical experiences and relationships with music.
 
-A range of studies has demonstrated the versatility of Reddit data within MIR and music perception and cognition. For example, [@if_i_like_2024] scraped ~5000 threads from r/ifyoulikeblank to compare human and algorithmic music recommendations, highlighting extra-musical factors in human suggestions. ASMR and music-induced frisson were analyzed via Reddit comments in [@asmr_article], supporting Huron’s frisson theory[@@huron_2006].
+A range of studies has demonstrated the versatility of Reddit data within MIR and music perception and cognition. For example, [@if_i_like_2024] scraped ~5000 threads from r/ifyoulikeblank to compare human and algorithmic music recommendations, highlighting extra-musical factors in human suggestions. ASMR and music-induced frisson were analyzed via Reddit comments in [@asmr_article], supporting Huron’s frisson theory[@huron_2006].
 
 Reddit’s anonymity enables vulnerable populations to discuss sensitive topics openly. [@bhavyajeet] analyzed r/depression and r/depressionMusic to identify music-listening strategies and their acoustic and lyrical properties. [@sharon2024] examined r/autism discussions, revealing pop and electronica preferences among individuals with ASD, contrasting earlier findings. These studies showcase the value of first-person accounts in music psychology research.
 
